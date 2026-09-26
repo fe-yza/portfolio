@@ -1,3 +1,4 @@
+import ProjectNavigation from "../components/ProjectNavigation"
 import { Fragment, useEffect } from "react"
 import { Link } from "react-router-dom"
 import "./StudentBudgetingCaseStudy.css"
@@ -413,10 +414,7 @@ export default function StudentBudgetingCaseStudy() {
           </div>
         </section>
 
-        <nav className="sb-next" aria-label="More projects">
-          <Link to="/work/focusup"><span className="sb-label">← Previous</span><b>FocusUp</b></Link>
-          <a href="#"><span className="sb-label">Next →</span><b>Project name</b></a>
-        </nav>
+        <ProjectNavigation current="/work/student-budgeting" />
       </div>
     </div>
   )

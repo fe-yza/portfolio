@@ -39,7 +39,7 @@ export const photos = [
     "id": "photo-barcelona",
     "src": "/hero/camera-roll/barcelona.jpg",
     "alt": "barcelona",
-    "caption": "barcelona!! arda turan bank, iykyk"
+    "caption": "barcelona!! arda turan bench, iykyk"
   },
   {
     "id": "photo-rome",

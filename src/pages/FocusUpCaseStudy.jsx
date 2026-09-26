@@ -1,3 +1,4 @@
+import ProjectNavigation from "../components/ProjectNavigation"
 import { Fragment, useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import { AnimatePresence, motion } from "framer-motion"
@@ -419,10 +420,7 @@ export default function FocusUpCaseStudy() {
           </div>
         </section>
 
-        <nav className="fu-next" aria-label="More projects">
-          <a href="#"><span className="fu-label">← Previous</span><b>Project name</b></a>
-          <a href="#"><span className="fu-label">Next →</span><b>Project name</b></a>
-        </nav>
+        <ProjectNavigation current="/work/focusup" />
       </div>
 
       <FocusUpLightbox

@@ -1,3 +1,4 @@
+import ProjectNavigation from "../components/ProjectNavigation"
 import { useEffect, useRef } from "react"
 import { Link } from "react-router-dom"
 import "./SiteSignalCaseStudy.css"
@@ -413,7 +414,7 @@ export default function SiteSignalCaseStudy() {
         </div>
       </header>
 
-      <div className="ss-marquee" aria-hidden="true">
+      <div data-nav-light className="ss-marquee" aria-hidden="true">
         <div className="ss-mq" id="ss-mq">
           {[0, 1].flatMap((rep) => [
             <span key={`${rep}-a`}>Real crawl data</span>,
@@ -531,7 +532,7 @@ export default function SiteSignalCaseStudy() {
       </section>
 
       {/* ============ PRINCIPLES ============ */}
-      <section className="ss-pad ss-principles">
+      <section data-nav-light className="ss-pad ss-principles">
         <div className="ss-wrap">
           <div className="ss-eyebrow ss-mono ss-reveal">04 — What makes it different</div>
           <h2 className="ss-h2 ss-reveal ss-d1">Real crawl data. Deterministic analysis. <em>No guesswork.</em></h2>
@@ -630,7 +631,7 @@ export default function SiteSignalCaseStudy() {
       </section>
 
       {/* ============ CTA ============ */}
-      <section className="ss-cta">
+      <section data-nav-light className="ss-cta">
         <div className="ss-rings"><i></i><i></i><i></i></div>
         <div className="ss-wrap">
           <h2 className="ss-reveal">Audit your<br /><em>website.</em></h2>
@@ -641,7 +642,8 @@ export default function SiteSignalCaseStudy() {
           </div>
         </div>
       </section>
-      <footer><div className="ss-wrap ss-mono" style={{ fontSize: "10px" }}><span>SiteSignal</span><span>Case study · Feyza Gulbent</span></div></footer>
+      <ProjectNavigation current="/work/sitesignal" />
+      <footer data-nav-light><div className="ss-wrap ss-mono" style={{ fontSize: "10px" }}><span>SiteSignal</span><span>Case study · Feyza Gulbent</span></div></footer>
     </div>
   )
 }

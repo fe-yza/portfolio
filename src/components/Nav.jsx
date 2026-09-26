@@ -23,9 +23,9 @@ export default function Nav() {
 
   useEffect(() => {
     if (forceLightNav) return
-    const hero = document.querySelector(".hero-nav-region")
+    const regions = [...document.querySelectorAll(".hero-nav-region, [data-nav-light]")]
     const nav = navRef.current
-    if (!hero || !nav) {
+    if (!regions.length || !nav) {
       setOverHero(false)
       return
     }
@@ -34,12 +34,13 @@ export default function Nav() {
       observer?.disconnect()
       // Observe a 1px horizontal band through the actual navigation row.
       const band = Math.round(nav.getBoundingClientRect().height / 2)
-      const rect = hero.getBoundingClientRect()
-      setOverHero(rect.top <= band && rect.bottom > band)
-      observer = new IntersectionObserver(([entry]) => {
-        setOverHero(entry.isIntersecting)
-      }, { rootMargin: `-${band}px 0px -${Math.max(0, window.innerHeight - band - 1)}px 0px`, threshold: 0 })
-      observer.observe(hero)
+      const update = () => setOverHero(regions.some((region) => {
+        const rect = region.getBoundingClientRect()
+        return rect.top <= band && rect.bottom > band
+      }))
+      update()
+      observer = new IntersectionObserver(update, { rootMargin: `-${band}px 0px -${Math.max(0, window.innerHeight - band - 1)}px 0px`, threshold: 0 })
+      regions.forEach((region) => observer.observe(region))
     }
     observe()
     const resizeObserver = new ResizeObserver(observe)

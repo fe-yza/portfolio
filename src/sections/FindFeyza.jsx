@@ -51,7 +51,7 @@ export default function FindFeyza() {
   const handleSelect = (figure) => {
     setExploredActivities((previous) => new Set(previous).add(figure.id))
   }
-  const remaining = Math.min(MAX_TRIES, figures.length - exploredActivities.size)
+  const remaining = MAX_TRIES - exploredActivities.size
 
   return (
     <section id="play" className="relative overflow-hidden bg-mint-50 py-12 sm:py-16">

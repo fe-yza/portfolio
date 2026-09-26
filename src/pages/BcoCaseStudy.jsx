@@ -1,3 +1,4 @@
+import ProjectNavigation from "../components/ProjectNavigation"
 import { useEffect, useRef } from "react"
 import { Link } from "react-router-dom"
 import "./BcoCaseStudy.css"
@@ -699,6 +700,7 @@ export default function BcoCaseStudy() {
         </div>
       </section>
 
+      <ProjectNavigation current="/work/bco" />
       <footer>
         <div className="bco-wrap bco-mono" style={{ fontSize: "10px" }}>
           <span>Builders Collective Ottawa</span>

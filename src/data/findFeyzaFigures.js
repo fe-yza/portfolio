@@ -10,5 +10,5 @@ export const figures = [
   { id: "running", caption: "I run and lift in my free time! One of my biggest goals is to complete an ironman", viewport: [1066, 215, 467, 554], desktop: { w: 13, x: 76, y: 66 }, mobile: { w: 29, x: 57, y: 78 } },
 ]
 export const FIRST_CLICK_MESSAGE = "actually, these are all me"
-// The first discovery reveals the joke; six more activities remain to explore.
-export const MAX_TRIES = figures.length - 1
+// Each figure counts as one discovery.
+export const MAX_TRIES = figures.length

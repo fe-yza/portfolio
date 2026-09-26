@@ -231,7 +231,7 @@
 .bco-press blockquote{font-family:var(--serif);font-size:clamp(38px,5vw,72px);line-height:1;letter-spacing:-.01em}
 .bco-press blockquote em{color:var(--ice-deep)}
 .bco-press .bco-src{margin-top:24px;font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted-ink)}
-.bco-btn{display:inline-flex;align-items:center;gap:14px;margin-top:36px;padding:18px 26px;background:var(--ink);color:var(--paper);text-decoration:none;font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;border-radius:999px;transition:gap .3s,background .3s}
+.bco-page .bco-btn{display:inline-flex;align-items:center;gap:14px;margin-top:36px;padding:18px 26px;background:var(--ink);color:#fff;text-decoration:none;font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;border-radius:999px;transition:gap .3s,background .3s}
 .bco-btn:hover{gap:24px;background:var(--ice-deep)}
 .bco-btn.bco-light{background:var(--paper);color:var(--ink)}
 .bco-btn.bco-light:hover{background:var(--ice)}
