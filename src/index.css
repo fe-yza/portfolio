@@ -1,0 +1,318 @@
+@import "tailwindcss";
+
+@theme {
+  /* pastel green */
+  --color-mint-50: #f4faf6;
+  --color-mint-100: #e3f4ea;
+  --color-mint-200: #c9e9d7;
+  --color-mint-300: #a8dabf;
+  --color-mint-400: #82c7a3;
+  --color-mint-500: #5fae85;
+  --color-mint-600: #45906a;
+  --color-mint-700: #357354;
+
+  /* pastel blue */
+  --color-sky-50: #f1f9fc;
+  --color-sky-100: #dcf1f8;
+  --color-sky-200: #bfe6f2;
+  --color-sky-300: #98d5e8;
+  --color-sky-400: #6ec0da;
+  --color-sky-500: #4aa5c2;
+  --color-sky-600: #35839f;
+
+  /* neutrals */
+  --color-ink: #2a2a26;
+  --color-ink-soft: #5c584f;
+  --color-paper: #fdfcf9;
+  --color-paper-line: #e9e5da;
+
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-script: "Caveat", cursive;
+
+  --shadow-soft: 0 8px 24px -8px rgba(42, 42, 38, 0.15);
+  --shadow-lift: 0 16px 32px -12px rgba(42, 42, 38, 0.22);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: #ffffff;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--color-mint-200);
+  color: var(--color-ink);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-mint-300) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-mint-200);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.font-script {
+  font-family: var(--font-script);
+}
+
+/* subtle sketchbook paper texture, layered on top of the near-white base */
+.paper-texture {
+  background-color: var(--color-paper);
+  background-image:
+    radial-gradient(rgba(42, 42, 38, 0.035) 1px, transparent 1px),
+    repeating-linear-gradient(
+      transparent,
+      transparent 27px,
+      rgba(42, 42, 38, 0.035) 28px
+    );
+  background-size:
+    14px 14px,
+    100% 28px;
+}
+
+/* film-strip sprocket holes, used as a background strip */
+.sprocket-row {
+  background-image: radial-gradient(
+    circle,
+    rgba(42, 42, 38, 0.55) 0 4px,
+    transparent 4.5px
+  );
+  background-size: 28px 100%;
+  background-repeat: repeat-x;
+}
+
+.tape {
+  background: linear-gradient(
+    100deg,
+    rgba(255, 255, 255, 0.55),
+    rgba(255, 255, 255, 0.25)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 2px 6px rgba(42, 42, 38, 0.12);
+}
+
+.focus-ring:focus-visible {
+  outline: 2px solid var(--color-sky-400);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Keep every scene layer in the illustration's original coordinate system.
+   Extra height extends the sky, never stretches or crops away the shoreline. */
+.hero {
+  --brush-depth: clamp(60px, 7vw, 110px);
+  --brush-overlap: clamp(50px, 5vw, 80px);
+  min-height: 100vh;
+  min-height: 100svh;
+  height: max(100svh, 56.28vw, 740px);
+  isolation: isolate;
+  background: var(--color-paper);
+}
+.hero-art {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+
+}
+.hero-sky-extension {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.hero-scene {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  aspect-ratio: 1672 / 941;
+  container-type: inline-size;
+}
+.hero-background { position: absolute; inset: 0; width: 100%; height: auto; z-index: 0; }
+.hero-bird-path {
+  position: absolute; inset: 15% 0 auto; height: 8%; z-index: 1;
+  animation: hero-glide 68s linear infinite;
+  animation-delay: -22s;
+}
+.hero-bird { width: 5%; height: auto; }
+.hero-boat-lane {
+  position: absolute; left: 58%; right: 0; top: 80%; height: 8%;
+  overflow: hidden; z-index: 1;
+}
+.hero-boat-crossing {
+  width: 100%; height: 100%;
+  animation: hero-sail 60s linear infinite; animation-delay: -26s;
+}
+.hero-boat { width: 9.1%; height: auto; animation: hero-bob 7.3s ease-in-out infinite alternate; }
+
+.hero-leaves { position: absolute; inset: 0; overflow: hidden; z-index: 3; }
+.hero-leaf-track {
+  position: absolute; width: clamp(12px, 1.6vw, 25px);
+  animation: hero-leaf-drift var(--fall-duration) ease-in-out var(--fall-delay) infinite;
+}
+.hero-leaf {
+  width: 100%; height: auto; overflow: hidden;
+  animation: hero-leaf-fall var(--fall-duration) linear var(--fall-delay) infinite;
+}
+.hero-foreground {
+  position: absolute; bottom: -1%; height: auto; z-index: 6;
+  transform-origin: 50% 100%;
+}
+.hero-foreground-left { left: -4%; width: 26%; animation: hero-wind 7s ease-in-out -2s infinite alternate; }
+.hero-foreground-right { right: -5%; width: 32%; scale: -1 1; animation: hero-wind 8.5s ease-in-out -5s infinite alternate-reverse; }
+.hero-content { z-index: 5; padding-top: clamp(100px, 9vw, 160px); }
+.hero-title { width: clamp(250px, 34vw, 490px); max-width: 100%; }
+.hero-title img { display: block; width: 100%; height: auto; }
+.hero-supporting-copy { font-size: clamp(1.15rem, 1.7vw, 1.6rem); font-weight: 500; }
+.hero-nav-region { position: absolute; inset: 0 0 var(--brush-overlap); pointer-events: none; }
+.hero-brush-divider { position: relative; height: 0; z-index: 7; pointer-events: none; }
+.hero-brush-divider svg {
+  position: absolute; left: -5%; top: calc(-1 * clamp(50px, 5vw, 80px));
+  width: 110%; height: clamp(120px, 11vw, 180px);
+}
+.site-nav { background: transparent; color: #142b3a; transition: color 250ms ease; }
+.site-nav[data-over-hero="true"] { color: #fff; }
+.site-nav a, .site-nav button { color: inherit; font-weight: 600; }
+@keyframes hero-glide {
+  from { transform: translate(-8%, 0); }
+  to { transform: translate(108%, 8px); }
+}
+@keyframes hero-sail {
+  from { transform: translateX(102%); }
+  to { transform: translateX(-10%); }
+}
+@keyframes hero-bob { from { transform: translateY(0); } to { transform: translateY(1.5px); } }
+@keyframes hero-leaf-drift {
+  0% { transform: translateX(0); opacity: 0; }
+  8%, 85% { opacity: .42; }
+  50% { transform: translateX(calc(var(--drift) * .4)); }
+  100% { transform: translateX(var(--drift)); opacity: 0; }
+}
+@keyframes hero-leaf-fall {
+  from { transform: translateY(0) rotate(-12deg); }
+  to { transform: translateY(62cqw) rotate(var(--turn)); }
+}
+@keyframes hero-wind {
+  from { transform: translate(0, 0) rotate(-1deg); }
+  to { transform: translate(3px, 2px) rotate(1deg); }
+}
+@media (max-width: 639px) {
+  .hero { --brush-depth: 36px; --brush-overlap: 32px; height: max(100svh, 680px); }
+  .hero-brush-divider svg { top: -32px; height: 80px; }
+  .hero-foreground { bottom: 2%; }
+  .hero-supporting-copy { max-width: 290px; }
+  .hero-content { padding-top: 112px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-art *, .hero-art { animation: none !important; }
+  .hero-bird-path { transform: translateX(76%); }
+  .hero-boat-crossing { transform: translateX(40%); }
+  .hero-leaf-track { opacity: .3; }
+  html { scroll-behavior: auto; }
+}
+
+/* Drag owns the outer transform; idle and hover transforms stay on children. */
+.hero { overflow: clip; }
+.hero-star {
+  position: absolute;
+  z-index: 9;
+  --star-size: clamp(200px, 22vw, 320px);
+  width: var(--star-size);
+  aspect-ratio: 1;
+  padding: 10px;
+  border: 0;
+  background: transparent;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.hero-star[data-dragging="true"] { cursor: grabbing; }
+.hero-star-hover { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; }
+.hero-star-image {
+  width: 100%; height: 100%; object-fit: contain; pointer-events: none;
+  transform: rotate(var(--star-tilt));
+  animation: hero-star-idle var(--star-duration) ease-in-out var(--star-delay) infinite alternate;
+}
+.hero-star[data-dragging="true"] .hero-star-image { animation-play-state: paused; }
+@keyframes hero-star-idle {
+  0% { transform: translate(-5px, -6px) rotate(calc(var(--star-tilt) - 6deg)); }
+  45% { transform: translate(4px, -1px) rotate(calc(var(--star-tilt) + 2deg)); }
+  100% { transform: translate(6px, 7px) rotate(calc(var(--star-tilt) + 7deg)); }
+}
+@media (max-width: 639px) {
+  .hero-star { --star-size: clamp(140px, 38vw, 180px); padding: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-star-image { animation: none; }
+}
+
+.park-composition { container-type: inline-size; }
+.park-scene { aspect-ratio: 1.65 / 1; min-height: 480px; container-type: inline-size; }
+.park-figure {
+  position: absolute;
+  width: var(--figure-width);
+  left: var(--figure-x);
+  top: var(--figure-y);
+}
+.park-figure-trigger {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.park-figure-caption {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 50%;
+  width: max(100%, clamp(150px, 22cqw, 235px));
+  transform: translateX(-50%);
+  color: var(--color-ink);
+  font-size: clamp(12px, 1.25cqw, 14px);
+  line-height: 1.4;
+  text-align: center;
+  pointer-events: none;
+}
+.park-figure-caption p {
+  margin: 0 -6px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  background: rgb(255 255 255 / 80%);
+}
+.park-leaf-shadow {
+  transform-origin: 0% 0%;
+  animation: park-canopy-sway 6.5s ease-in-out infinite;
+}
+@keyframes park-canopy-sway {
+  0%, 100% { transform: rotate(-2deg) translate3d(-6px, -2px, 0) scale(1.04); }
+  50% { transform: rotate(2deg) translate3d(8px, 4px, 0) scale(1.055); }
+}
+@media (max-width: 639px) {
+  .park-scene { aspect-ratio: auto; height: calc(155cqw + 210px); min-height: 0; }
+  .park-figure { width: var(--mobile-width); left: var(--mobile-x); top: var(--mobile-y); }
+  .park-figure-caption { width: max(100%, 140px); font-size: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .park-leaf-shadow { animation: none; }
+}

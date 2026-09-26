@@ -1,0 +1,39 @@
+/* Keep the original caption slot and photo geometry; notes don't move the film. */
+.film-caption {
+  position: absolute;
+  inset: 0 0 auto;
+  padding: 3px 5px 5px;
+  background: var(--color-paper);
+  font-size: 17px;
+  line-height: 1.1;
+  opacity: 0;
+  transform: translateY(3px) rotate(-1deg);
+  pointer-events: none;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.film-photo { cursor: pointer; }
+.film-photo:disabled { cursor: default; }
+
+.film-frame:has(.film-photo:focus-visible) .film-caption {
+  opacity: 1;
+  transform: translateY(0) rotate(-1deg);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .film-frame:hover .film-caption {
+    opacity: 1;
+    transform: translateY(0) rotate(-1deg);
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .film-frame[data-caption-open="true"] .film-caption {
+    opacity: 1;
+    transform: translateY(0) rotate(-1deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .film-caption { transition: none; }
+}

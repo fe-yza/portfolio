@@ -1,0 +1,366 @@
+<title>Student Budgeting App</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Deliberate single-look identity: Scotiabank's own red/white/black system.
+   The brand doesn't switch to a dark palette, so this page doesn't either —
+   background and every color below are painted explicitly so it holds on
+   any host ground. */
+:root{
+  --ground:#ffffff;
+  --surface:#f7f7f8;
+  --ink:#0d0d0d;
+  --muted:#5c5c5f;
+  --line:#e6e6e8;
+  --accent:#ec111a;
+  --accent2:#a80d14;
+  --pink:#fdecec;
+  --pgreen:#e3f2e6;
+  --pgreen-ink:#256b3b;
+  --placeholder:#fdeecb;
+  --placeholder-ink:#8a5a00;
+  --stage-a:#ffffff;
+  --stage-b:#f4f4f5;
+  --display:"Bricolage Grotesque","Figtree",system-ui,sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  color-scheme:light;
+}
+
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding-inline:clamp(16px,4vw,40px)}
+h1,h2,h3{font-family:var(--display);line-height:1.08;margin:0;text-wrap:balance;letter-spacing:-0.02em}
+p{margin:0}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+a{color:inherit}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+.todo{background:var(--placeholder);color:var(--placeholder-ink);border-radius:6px;padding:1px 8px;font-family:var(--mono);font-size:.8em;white-space:nowrap}
+
+/* top bar */
+.crumbs{display:flex;justify-content:space-between;align-items:center;gap:16px;padding-block:24px}
+.crumbs a{text-decoration:none;font-weight:500;font-size:15px}
+.crumbs a:hover{color:var(--accent)}
+.brand{display:flex;align-items:center;gap:10px}
+.brand img{width:28px;height:28px;border-radius:8px;display:block}
+
+/* hero */
+.hero{padding-block:clamp(32px,6vw,72px) 40px;display:grid;gap:28px}
+.hero h1{font-size:clamp(46px,9vw,104px);font-weight:800;letter-spacing:-0.04em}
+.hero h1 span{color:var(--accent)}
+.lead{font-size:clamp(20px,2.4vw,26px);line-height:1.4;max-width:34ch;font-family:var(--display);font-weight:400;letter-spacing:-0.01em}
+.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:20px 32px;border-top:1px solid var(--line);padding-top:24px;margin-top:8px}
+.meta dt{margin-bottom:4px}
+.meta dd{margin:0;font-weight:500;font-size:16px;line-height:1.45}
+
+/* stage */
+.stage{background:linear-gradient(180deg,var(--stage-a),var(--stage-b));border-top:4px solid var(--accent);border-radius:28px;overflow:hidden;box-shadow:0 1px 0 var(--line) inset}
+.stage-scroll{overflow-x:auto;scrollbar-width:thin}
+.phones{display:flex;gap:clamp(14px,2.2vw,26px);justify-content:safe center;align-items:flex-end;padding:clamp(32px,5vw,56px) clamp(20px,3vw,40px) clamp(20px,3vw,32px);width:max-content;min-width:100%}
+.phones figure{margin:0;flex:0 0 auto;width:clamp(128px,13vw,158px);transition:transform .4s ease}
+.phones img{display:block;width:100%;height:auto;border-radius:10px;border:1px solid var(--line);filter:drop-shadow(0 16px 28px rgba(20,10,10,.14))}
+.phones figcaption{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:center;margin-top:14px}
+.phones-more{display:flex;gap:clamp(10px,1.6vw,18px);justify-content:safe center;align-items:flex-end;padding:0 clamp(20px,3vw,40px) clamp(28px,4.5vw,48px);width:max-content;min-width:100%;border-top:1px dashed var(--line);margin-top:4px;padding-top:clamp(20px,3vw,28px)}
+.phones-more figure{margin:0;flex:0 0 auto;width:clamp(84px,7.5vw,98px);opacity:.88}
+.phones-more img{display:block;width:100%;height:auto;border-radius:8px;border:1px solid var(--line);filter:drop-shadow(0 10px 18px rgba(20,10,10,.12))}
+.phones-more figcaption{font-family:var(--mono);font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);text-align:center;margin-top:10px}
+@media (hover:hover){.phones figure:hover{transform:translateY(-8px)}}
+
+/* sections */
+section.block{padding-block:clamp(56px,8vw,104px);border-bottom:1px solid var(--line)}
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:24px 56px}
+.split h2{font-size:clamp(30px,4vw,44px);font-weight:600}
+.prose{display:grid;gap:18px;max-width:64ch;color:var(--ink)}
+.prose p{color:var(--muted)}
+.prose strong{color:var(--ink);font-weight:600}
+@media (max-width:760px){.split{grid-template-columns:1fr}}
+
+/* problem statement */
+.hmw{margin-top:8px;padding:22px 24px;border-radius:18px;background:var(--pink);font-family:var(--display);font-size:clamp(20px,2.4vw,24px);line-height:1.35;font-weight:600;color:var(--ink)}
+.hmw .label{display:block;margin-bottom:8px;color:var(--accent)}
+
+/* goals */
+.goals{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0;margin-top:40px;border-top:1px solid var(--line)}
+.goal{padding:24px 24px 8px 0;display:grid;gap:10px;align-content:start}
+.goal+.goal{padding-left:24px;border-left:1px solid var(--line)}
+@media (max-width:820px){.goal+.goal{padding-left:0;border-left:0;border-top:1px solid var(--line)}}
+.goal h3{font-size:22px;font-weight:600}
+.goal p{color:var(--muted);font-size:16px}
+.goal .where{font-family:var(--mono);font-size:12px;color:var(--accent2)}
+
+/* flow */
+.flow-scroll{overflow-x:auto;margin-top:40px;padding-bottom:8px}
+.flow{display:flex;align-items:stretch;gap:0;min-width:640px}
+.step{flex:1;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 16px 18px;display:grid;gap:4px;align-content:start}
+.step .n{font-family:var(--mono);font-size:12px;color:var(--accent)}
+.step b{font-family:var(--display);font-weight:600;font-size:18px}
+.step span{font-size:14px;color:var(--muted);line-height:1.4}
+.arrow{flex:0 0 36px;display:grid;place-items:center;color:var(--muted)}
+.loop{min-width:640px;display:flex;justify-content:flex-end;padding-right:6%;margin-top:10px}
+.loop svg{width:78%;height:40px;overflow:visible}
+.loop text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
+
+/* screens */
+.screen{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(28px,6vw,88px);align-items:center;padding-block:clamp(40px,6vw,72px)}
+.screen+.screen{border-top:1px dashed var(--line)}
+.screen:nth-of-type(even) .shot{order:2}
+.shot{background:var(--surface);border:1px solid var(--line);border-top:3px solid var(--accent);border-radius:24px;padding:clamp(28px,4vw,48px) 20px;display:grid;place-items:center}
+.shot img{width:min(220px,100%);height:auto;border-radius:14px;border:1px solid var(--line);filter:drop-shadow(0 16px 28px rgba(20,10,10,.14))}
+.screen-text{display:grid;gap:16px;max-width:52ch}
+.screen-text h3{font-size:clamp(26px,3vw,34px);font-weight:600}
+.screen-text > p{color:var(--muted)}
+.notes{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:12px}
+.notes li{display:grid;grid-template-columns:22px 1fr;gap:10px;font-size:15.5px;line-height:1.5}
+.notes li::before{content:"";width:10px;height:10px;border-radius:50%;margin-top:7px;background:var(--accent)}
+.notes b{font-weight:600}
+@media (max-width:760px){.screen{grid-template-columns:1fr}.screen:nth-of-type(even) .shot{order:0}}
+
+/* secondary strip: more in the app */
+.more-intro{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:8px}
+.more-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:16px;margin-top:28px}
+.more-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;display:grid;gap:10px;justify-items:center;text-align:center}
+.more-card img{width:min(120px,100%);height:auto;border-radius:10px;filter:drop-shadow(0 10px 18px rgba(0,0,0,.18))}
+.more-card b{font-size:14.5px;font-weight:600}
+.more-card span{font-size:13px;color:var(--muted);line-height:1.4}
+
+/* system */
+.swatches{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-top:40px}
+.sw{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--ground)}
+.sw i{display:block;height:96px}
+.sw div{padding:12px 14px;display:grid;gap:2px}
+.sw b{font-weight:600;font-size:15px}
+.sw code{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.sw small{font-size:13px;color:var(--muted);line-height:1.4}
+.sys-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:14px}
+.panel{border:1px solid var(--line);border-radius:16px;padding:22px;display:grid;gap:14px;align-content:start}
+.panel h3{font-size:20px;font-weight:600}
+.panel p{color:var(--muted);font-size:15.5px}
+.specimen{font-family:var(--body);display:grid;gap:4px}
+.specimen .big{font-size:40px;font-weight:600;letter-spacing:-0.02em;line-height:1;font-variant-numeric:tabular-nums}
+.demo{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:12px;justify-items:center}
+.bar-demo{width:100%;max-width:240px;display:grid;gap:6px}
+.bar-demo .track{height:14px;border-radius:999px;background:var(--line);overflow:hidden}
+.bar-demo .fill{height:100%;width:79%;border-radius:999px;background:var(--accent)}
+.bar-demo .row{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);font-family:var(--mono)}
+.btn-p{width:100%;max-width:220px;text-align:center;padding:11px 0;border-radius:999px;color:#fff;font-weight:600;font-size:15px;background:var(--accent);box-shadow:0 6px 16px rgba(236,17,26,.22)}
+.btn-s{width:100%;max-width:220px;text-align:center;padding:10px 0;border-radius:999px;color:var(--ink);font-weight:500;font-size:14px;border:1px solid var(--line);background:#fff}
+.chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.chip{color:var(--muted);font-size:12px;padding:6px 10px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+
+/* reflection */
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:40px;margin-top:40px}
+.two h3{font-size:22px;font-weight:600;margin-bottom:14px}
+.two ul{margin:0;padding-left:18px;display:grid;gap:12px;color:var(--muted)}
+.two li strong{color:var(--ink);font-weight:600}
+
+/* footer nav */
+.next{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-block:48px 64px}
+.next a{text-decoration:none;display:grid;gap:4px}
+.next a b{font-family:var(--display);font-size:clamp(24px,3vw,32px);font-weight:600;letter-spacing:-0.02em}
+.next a:hover b{color:var(--accent)}
+.next a:last-child{text-align:right}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <a href="#">← All work</a>
+    <span class="brand"><img src="img/scotiabankicon.png" alt=""><span class="label">Case study · Mobile app</span></span>
+  </nav>
+
+  <header class="hero">
+    <span class="label">iOS app · UX / UI design · Personal project</span>
+    <h1>Student <span>Budgeting</span> App</h1>
+    <p class="lead">A banking dashboard rebuilt around how students actually spend and save — small goals, tight budgets, and the need to see it all in one glance.</p>
+    <dl class="meta">
+      <div><dt class="label">Role</dt><dd>Product designer — research, UX flows, UI &amp; visual design</dd></div>
+      <div><dt class="label">Platform</dt><dd>iOS, iPhone 15 Pro frame</dd></div>
+      <div><dt class="label">Tools</dt><dd>Figma</dd></div>
+      <div><dt class="label">Timeline</dt><dd>December 2025 – January 2026</dd></div>
+      <div><dt class="label">Scope</dt><dd>End-to-end concept, 7 core screens</dd></div>
+    </dl>
+  </header>
+</div>
+
+<div class="wrap">
+  <div class="stage" role="img" aria-label="Seven Student Budgeting App screens: home dashboard, savings goals overview, add a new goal, spending analytics, transactions, budget, and advice">
+    <div class="stage-scroll">
+      <div class="phones">
+        <figure><img src="img/scotiabank1.png" alt="Home dashboard showing monthly spending summary and savings goals"><figcaption>Home</figcaption></figure>
+        <figure><img src="img/scotiabank2.png" alt="Savings goals overview with progress bars"><figcaption>Goals</figcaption></figure>
+        <figure><img src="img/scotiabank3.png" alt="Add a new goal form"><figcaption>Add goal</figcaption></figure>
+      </div>
+      <div class="phones-more">
+        <figure><img src="img/scotiabank4.png" alt="Spending analytics with donut chart and monthly trend"><figcaption>Analytics</figcaption></figure>
+        <figure><img src="img/scotiabank5.png" alt="Transactions list grouped by day"><figcaption>Transactions</figcaption></figure>
+        <figure><img src="img/scotiabank6.png" alt="Budget screen with category budgets"><figcaption>Budget</figcaption></figure>
+        <figure><img src="img/scotiabank7.png" alt="Advice tab with personalized tips"><figcaption>Advice</figcaption></figure>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <section class="block split" id="overview">
+    <div><span class="label">Overview</span><h2 style="margin-top:12px">Banking apps aren't built for a student's money</h2></div>
+    <div class="prose">
+      <p><strong>Most banking dashboards are built for a general adult user</strong> — a mortgage, a car payment, a retirement fund. A student's financial life looks different: irregular income, small recurring costs, and savings goals sized in the hundreds, not the thousands — a trip, a gadget, a gift. Squeezed into a generic dashboard, those goals get buried under features that don't apply yet.</p>
+      <p>This concept keeps the trusted visual language of a bank's app — the red, the density, the credibility — but restructures the information around what a student checks daily: <em>how much is left, and how close am I to what I'm saving for.</em></p>
+      <p class="hmw"><span class="label">How might we</span>help students see their spending clearly and stay motivated toward small, specific savings goals?</p>
+    </div>
+  </section>
+
+  <section class="block" id="goals">
+    <span class="label">Design goals</span>
+    <h2 style="margin-top:12px;font-size:clamp(30px,4vw,44px);font-weight:600;max-width:20ch">Three principles shaped every screen</h2>
+    <div class="goals">
+      <div class="goal"><h3>Answer in one glance</h3><p>The two facts a student checks most — how much they've spent, how close they are to a goal — surface before anything else, with no tapping required.</p><span class="where">→ Home</span></div>
+      <div class="goal"><h3>Make saving feel achievable</h3><p>Abstract "saving" becomes named, sized goals with visible progress and a plain-language status, so momentum is always visible.</p><span class="where">→ Goals overview</span></div>
+      <div class="goal"><h3>Default toward consistency</h3><p>Setting up a goal defaults to automatic weekly transfers, with manual saving as the explicit opt-out — the easy path is also the good habit.</p><span class="where">→ Add a new goal</span></div>
+    </div>
+  </section>
+
+  <section class="block" id="flow">
+    <span class="label">User flow</span>
+    <h2 style="margin-top:12px;font-size:clamp(30px,4vw,44px);font-weight:600;max-width:22ch">From checking in to committing to a goal</h2>
+    <p style="color:var(--muted);max-width:60ch;margin-top:16px">The core path a student takes weekly: check the dashboard, review what they're saving for, and — when something new comes up — set up a goal for it in under a minute.</p>
+    <div class="flow-scroll">
+      <div class="flow">
+        <div class="step"><span class="n">01</span><b>Home</b><span>Check spending &amp; goal progress</span></div>
+        <div class="arrow" aria-hidden="true">→</div>
+        <div class="step"><span class="n">02</span><b>Goals overview</b><span>Review every goal in one list</span></div>
+        <div class="arrow" aria-hidden="true">→</div>
+        <div class="step"><span class="n">03</span><b>Add a new goal</b><span>Name it, fund it, done</span></div>
+      </div>
+      <div class="loop" aria-hidden="true">
+        <svg viewBox="0 0 600 40" preserveAspectRatio="none">
+          <path d="M590 2 V26 H10 V2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 5" vector-effect="non-scaling-stroke" style="color:var(--accent)"/>
+          <path d="M4 10 L10 2 L16 10" fill="none" stroke="currentColor" stroke-width="1.5" vector-effect="non-scaling-stroke" style="color:var(--accent)"/>
+        </svg>
+      </div>
+      <div class="loop" style="margin-top:0"><span class="label" style="width:78%;text-align:center">Back to home, goal now tracked automatically</span></div>
+    </div>
+  </section>
+
+  <section class="block" id="screens" style="padding-bottom:24px">
+    <span class="label">Key screens</span>
+    <h2 style="margin-top:12px;font-size:clamp(30px,4vw,44px);font-weight:600">Where the redesign does the most work</h2>
+
+    <article class="screen">
+      <div class="shot"><img src="img/scotiabank1.png" alt="Home dashboard"></div>
+      <div class="screen-text">
+        <span class="label">01 · Home dashboard</span>
+        <h3>Every number framed as a decision, not just data</h3>
+        <p>The home screen leads with a personal greeting and a single spending figure — but never in isolation. Every number is framed against something: typical spending, a budget ceiling, a goal's finish line.</p>
+        <ul class="notes">
+          <li><span><b>$437 vs. "typical spending"</b> — turns a raw total into a comparison, so a student can tell if this month is normal without doing the math.</span></li>
+          <li><span><b>Budget bar at 79%</b> reads as color and length before it reads as a number, so status is legible at a glance.</span></li>
+          <li><span><b>Savings goals preview</b> surfaces three goals with progress bars right on the dashboard — no separate screen needed just to feel the momentum.</span></li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="screen">
+      <div class="shot"><img src="img/scotiabank2.png" alt="Savings goals overview"></div>
+      <div class="screen-text">
+        <span class="label">02 · Savings goals overview</span>
+        <h3>Every goal is its own small win in progress</h3>
+        <p>Zooming into savings turns three progress bars into full cards — each with a name, a dollar milestone, and a status written in plain language rather than a raw percentage alone.</p>
+        <ul class="notes">
+          <li><span><b>"Add a new goal"</b> sits first on the page, always the easiest next action rather than buried in a menu.</span></li>
+          <li><span><b>Status lines</b> like "You're ahead by 3 months" translate a progress bar into something worth feeling good about.</span></li>
+          <li><span><b>Overflow menu (•••)</b> keeps edit and pause actions available without cluttering the primary view.</span></li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="screen">
+      <div class="shot"><img src="img/scotiabank3.png" alt="Add a new goal form"></div>
+      <div class="screen-text">
+        <span class="label">03 · Add a new goal</span>
+        <h3>Three decisions, not a spreadsheet</h3>
+        <p>Setting up a goal asks for a name and a target, grounds it in a real account, then asks the one question that determines whether the habit sticks: how does the money actually get there?</p>
+        <ul class="notes">
+          <li><span><b>Placeholder examples</b> ("Emergency Fund") lower the blank-page problem of naming a goal from scratch.</span></li>
+          <li><span><b>Automatic weekly transfer is the default</b>, expanded and pre-filled — manual saving is available, but never the assumed choice.</span></li>
+          <li><span><b>"Move leftover budget at month-end"</b> turns unused spending money into savings without asking the student to remember to do it.</span></li>
+        </ul>
+      </div>
+    </article>
+  </section>
+
+  <section class="block" id="more">
+    <div class="more-intro">
+      <div><span class="label">Also in the app</span><h2 style="margin-top:12px;font-size:clamp(26px,3.4vw,36px);font-weight:600;max-width:26ch">Supporting screens that round out the experience</h2></div>
+    </div>
+    <p style="color:var(--muted);max-width:60ch;margin-top:16px">Analytics, transactions, budget and advice extend the same dashboard logic into deeper detail — built out, but secondary to the three screens above that carry the core idea.</p>
+    <div class="more-grid">
+      <div class="more-card"><img src="img/scotiabank4.png" alt="Spending analytics"><b>Analytics</b><span>Category breakdown &amp; monthly trend</span></div>
+      <div class="more-card"><img src="img/scotiabank5.png" alt="Transactions list"><b>Transactions</b><span>Searchable, grouped by day</span></div>
+      <div class="more-card"><img src="img/scotiabank6.png" alt="Budget screen"><b>Budget</b><span>Category-level limits &amp; pacing</span></div>
+      <div class="more-card"><img src="img/scotiabank7.png" alt="Advice tab"><b>Advice</b><span>Personalized, actionable tips</span></div>
+    </div>
+  </section>
+
+  <section class="block" id="system">
+    <span class="label">Visual system</span>
+    <h2 style="margin-top:12px;font-size:clamp(30px,4vw,44px);font-weight:600;max-width:22ch">A white canvas, one red signal</h2>
+    <p style="color:var(--muted);max-width:62ch;margin-top:16px">The system stays deliberately restrained — white surfaces, near-black text, and a single confident red reserved for headers and primary actions. No gradients, no secondary accent competing for attention: red always means "this is the important thing on the screen."</p>
+
+    <div class="swatches">
+      <div class="sw"><i style="background:#ec111a"></i><div><b>Signal red</b><code>#EC111A</code><small>Headers, primary actions</small></div></div>
+      <div class="sw"><i style="background:#a80d14"></i><div><b>Deep red</b><code>#A80D14</code><small>Pressed states, emphasis</small></div></div>
+      <div class="sw"><i style="background:#0d0d0d"></i><div><b>Near-black</b><code>#0D0D0D</code><small>Body text, headings</small></div></div>
+      <div class="sw"><i style="background:#f7f7f8;border-bottom:1px solid var(--line)"></i><div><b>Cool grey</b><code>#F7F7F8</code><small>Cards, secondary surfaces</small></div></div>
+      <div class="sw"><i style="background:#fdecec"></i><div><b>Blush tint</b><code>#FDECEC</code><small>Soft callouts</small></div></div>
+    </div>
+
+    <div class="sys-grid">
+      <div class="panel">
+        <h3>Type</h3>
+        <div class="specimen"><span class="big">$437</span><span style="font-weight:600;font-size:20px">Good morning, Feyza</span><span style="color:var(--muted);font-size:14px">Rounded geometric sans throughout</span></div>
+        <p>A confident, rounded sans keeps the tone reassuring rather than alarming — bold weights carry dollar figures and headlines, regular weight handles supporting detail and disclaimers.</p>
+      </div>
+      <div class="panel">
+        <h3>Components</h3>
+        <div class="demo">
+          <div class="bar-demo"><div class="row"><span>79% of budget</span><span>$550 / $700</span></div><div class="track"><div class="fill"></div></div></div>
+          <div class="chips"><span class="chip">Spending</span><span class="chip on">Saving</span><span class="chip">Tips</span></div>
+          <div class="btn-p">Add a new goal</div>
+        </div>
+        <p>A single progress-bar language runs through the whole app — budgets, goals, category limits — so status is always readable the same way, wherever it appears.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="reflection" style="border-bottom:none">
+    <span class="label">Reflection</span>
+    <h2 style="margin-top:12px;font-size:clamp(30px,4vw,44px);font-weight:600;max-width:22ch">What I learned, and where it goes next</h2>
+    <div class="two">
+      <div>
+        <h3>Takeaways</h3>
+        <ul>
+          <li><strong>Comparison beats raw numbers.</strong> "$57 above typical spending" did more work than the $437 total ever could on its own.</li>
+          <li><strong>Small goals need their own language.</strong> A $150 gift and a $900 trip both deserve a status line, not just a percentage.</li>
+          <li><strong>Defaults are a design decision.</strong> Making automatic transfer the pre-filled option nudges behavior more than any copy could.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Next steps</h3>
+        <ul>
+          <li><strong>Usability testing</strong> with current students to validate goal sizes and whether the automatic-transfer default feels safe.</li>
+          <li><strong>Accessibility pass</strong> on red/white contrast ratios across every screen, especially small status text.</li>
+          <li><strong>Shared goals</strong> — letting a group split a savings goal, like a trip planned with friends.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <nav class="next" aria-label="More projects">
+    <a href="#"><span class="label">← Previous</span><b>FocusUp</b></a>
+    <a href="#"><span class="label">Next →</span><b>Project name</b></a>
+  </nav>
+</div>

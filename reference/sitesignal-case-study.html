@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SiteSignal Case Study</title>
+<meta name="description" content="SiteSignal — an SEO audit platform that crawls your site and tells you what to fix next. Designed and built by Feyza Gulbent.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;700&family=Caveat:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f6f5f0;
+  --paper-2:#eceae2;
+  --card:#ffffff;
+  --ink:#10131a;
+  --ink-2:#1a1f29;
+  --ink-3:#252b37;
+  --text:#10131a;
+  --text-2:#4a5160;
+  --muted:#7b8290;
+  --line:rgba(16,19,26,.12);
+  --line-d:rgba(255,255,255,.12);
+  --signal:#2f6bff;
+  --signal-soft:#dfe8ff;
+  --mint:#c9ecd9;
+  --high:#d64545;
+  --med:#c98712;
+  --low:#6b7280;
+  --good:#1f9d6b;
+  --serif:"Instrument Serif", Georgia, serif;
+  --mono:"JetBrains Mono", ui-monospace, monospace;
+  --hand:"Caveat", cursive;
+  --sans:"Inter", system-ui, sans-serif;
+  --gutter:clamp(16px,4vw,56px);
+  --max:1240px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--paper);color:var(--text);font-family:var(--sans);line-height:1.55;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+button{font:inherit}
+::selection{background:var(--signal);color:#fff}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 var(--gutter)}
+.mono{font-family:var(--mono);text-transform:uppercase;letter-spacing:.16em;font-size:11px}
+.hand{font-family:var(--hand)}
+.sig{color:var(--signal)}
+.pad{padding:clamp(88px,11vw,156px) 0}
+.eyebrow{display:flex;align-items:center;gap:12px;margin-bottom:24px;color:var(--muted)}
+.eyebrow::before{content:"";width:28px;height:1px;background:currentColor}
+.h2{font-family:var(--serif);font-weight:400;font-size:clamp(40px,6vw,88px);line-height:.96;letter-spacing:-.015em}
+.h2 em{color:var(--signal)}
+.lede{font-size:clamp(17px,1.4vw,19px);line-height:1.65;color:var(--text-2);max-width:58ch}
+
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .9s cubic-bezier(.2,.8,.2,1),transform .9s cubic-bezier(.2,.8,.2,1)}
+.reveal.in{opacity:1;transform:none}
+.d1{transition-delay:.08s}.d2{transition-delay:.16s}.d3{transition-delay:.24s}
+
+/* ---------- HERO ---------- */
+.hero{padding:clamp(56px,8vw,110px) 0 clamp(64px,8vw,120px);position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;background-image:radial-gradient(var(--line) 1px,transparent 1px);background-size:22px 22px;mask-image:radial-gradient(ellipse at 70% 30%,#000 10%,transparent 65%);-webkit-mask-image:radial-gradient(ellipse at 70% 30%,#000 10%,transparent 65%);pointer-events:none}
+.hero-grid{display:grid;grid-template-columns:1fr 1.08fr;gap:clamp(40px,5vw,80px);align-items:center;position:relative}
+.hero-grid > *,.problem > *,.hist-grid > *,.arch-grid > *,.role-grid > *{min-width:0}
+.tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px}
+.tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;padding:7px 11px;border:1px solid var(--line);background:var(--card);border-radius:3px}
+.tag.live{display:inline-flex;align-items:center;gap:8px;background:var(--ink);color:#fff;border-color:var(--ink);text-decoration:none}
+.tag.live i{width:7px;height:7px;border-radius:50%;background:#4ade80;box-shadow:0 0 0 0 rgba(74,222,128,.7);animation:ping 1.8s infinite}
+@keyframes ping{70%{box-shadow:0 0 0 8px rgba(74,222,128,0)}100%{box-shadow:0 0 0 0 rgba(74,222,128,0)}}
+.brandline{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.brandline svg{width:34px;height:34px;color:var(--signal)}
+.brandline b{font-family:var(--mono);font-size:13px;letter-spacing:.22em;text-transform:uppercase}
+.hero h1{font-family:var(--serif);font-weight:400;font-size:clamp(58px,8.6vw,132px);line-height:.88;letter-spacing:-.025em}
+.hero h1 em{color:var(--signal);position:relative;white-space:nowrap}
+.hero h1 em svg{position:absolute;left:0;right:0;bottom:-.08em;width:100%;height:.22em;overflow:visible}
+.hero h1 em svg path{stroke-dasharray:400;stroke-dashoffset:400;animation:draw 1.2s .6s cubic-bezier(.7,0,.3,1) forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.hero .lede{margin-top:28px}
+.hero-note{margin-top:22px;font-family:var(--hand);font-size:26px;color:var(--text-2);transform:rotate(-2deg);display:inline-block}
+.hero-meta{display:flex;gap:32px;margin-top:36px;flex-wrap:wrap}
+.hero-meta div b{display:block;font-family:var(--serif);font-weight:400;font-size:44px;line-height:1}
+.hero-meta div span{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+
+/* ---------- DEMO APP ---------- */
+.app{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 1px 0 rgba(16,19,26,.04),0 40px 80px -30px rgba(16,19,26,.28);overflow:hidden;position:relative}
+.app-bar{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line);background:#fbfbf9}
+.app-bar i{width:10px;height:10px;border-radius:50%;background:var(--paper-2)}
+.app-bar .url{margin-left:10px;flex:1;font-family:var(--mono);font-size:11px;color:var(--muted);background:var(--paper);border-radius:6px;padding:6px 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.app-bar .demo{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--signal);background:var(--signal-soft);padding:4px 8px;border-radius:4px}
+.app-body{padding:20px;min-height:470px}
+.run{display:flex;gap:8px}
+.run label{position:absolute;left:-9999px}
+.run input{flex:1;min-width:0;font-family:var(--mono);font-size:14px;padding:14px 14px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s}
+.run input:focus{border-color:var(--signal);box-shadow:0 0 0 4px var(--signal-soft)}
+.run button{border:0;background:var(--ink);color:#fff;border-radius:8px;padding:0 18px;font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;white-space:nowrap;transition:background .2s}
+.run button:hover{background:var(--signal)}
+.run button:disabled{opacity:.5;cursor:wait}
+.state{margin-top:18px}
+.idle{border:1px dashed var(--line);border-radius:10px;padding:34px 20px;text-align:center;color:var(--muted)}
+.idle .radar{width:120px;height:120px;margin:0 auto 18px;position:relative;border-radius:50%;border:1px solid var(--line);background:radial-gradient(circle,transparent 30%,var(--line) 31%,transparent 32%,transparent 60%,var(--line) 61%,transparent 62%)}
+.idle .radar::after{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,rgba(47,107,255,.35),transparent 25%);animation:sweep 3s linear infinite}
+.idle .radar::before{content:"";position:absolute;left:50%;top:50%;width:6px;height:6px;margin:-3px;border-radius:50%;background:var(--signal)}
+@keyframes sweep{to{transform:rotate(360deg)}}
+.idle p{font-size:14px}
+.idle .mono{margin-top:8px;display:block}
+
+.crawl-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.crawl-head b{font-family:var(--serif);font-weight:400;font-size:34px}
+.bar{height:6px;background:var(--paper-2);border-radius:99px;overflow:hidden;margin:12px 0 14px}
+.bar span{display:block;height:100%;width:0;background:var(--signal);border-radius:99px;transition:width .12s linear}
+.log{font-family:var(--mono);font-size:11.5px;line-height:1.9;background:var(--ink);color:#c9ced8;border-radius:8px;padding:14px;height:300px;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end}
+.log .ok{color:#4ade80}.log .warn{color:#fbbf24}.log .err{color:#f87171}.log .dim{color:#6b7280}
+
+.sum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.sum div{background:var(--paper);border-radius:8px;padding:12px}
+.sum b{font-family:var(--serif);font-weight:400;font-size:32px;line-height:1;display:block}
+.sum span{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.opp-head{display:flex;justify-content:space-between;align-items:center;margin:18px 0 8px}
+.opp-head .mono{color:var(--muted)}
+.opps{display:flex;flex-direction:column;gap:6px;max-height:318px;overflow:auto;padding-right:4px}
+.opps::-webkit-scrollbar{width:6px}.opps::-webkit-scrollbar-thumb{background:var(--paper-2);border-radius:9px}
+.opp{flex:none;border:1px solid var(--line);border-radius:8px;overflow:hidden;opacity:0;transform:translateY(8px);animation:in .45s cubic-bezier(.2,.8,.2,1) forwards;background:var(--card)}
+@keyframes in{to{opacity:1;transform:none}}
+.opp button{all:unset;box-sizing:border-box;width:100%;display:grid;grid-template-columns:22px 1fr auto;gap:10px;align-items:center;padding:11px 12px;cursor:pointer}
+.opp button:focus-visible{outline:2px solid var(--signal);outline-offset:-2px}
+.rank{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.opp .t{font-size:14px;font-weight:500;line-height:1.3}
+.opp .t small{display:block;font-weight:400;color:var(--muted);font-size:12px;margin-top:2px}
+.sev{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;padding:4px 8px;border-radius:4px;white-space:nowrap}
+.sev::before{content:"";width:6px;height:6px;border-radius:2px;background:currentColor}
+.sev.high{color:var(--high);background:#fbe9e9}
+.sev.med{color:var(--med);background:#fbf1de}
+.sev.low{color:var(--low);background:#eef0f3}
+.opp .why{max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(.2,.8,.2,1)}
+.opp.open .why{max-height:260px}
+.why-in{padding:0 12px 14px 44px;font-size:13px;color:var(--text-2)}
+.why-in .mono{color:var(--signal);font-size:9.5px;display:block;margin:10px 0 4px}
+.why-in code{font-family:var(--mono);font-size:11.5px;background:var(--paper);padding:2px 6px;border-radius:4px;margin:2px 4px 2px 0;display:inline-block}
+.again{margin-top:12px;font-family:var(--hand);font-size:21px;color:var(--text-2);display:flex;align-items:center;gap:8px}
+.again button{all:unset;cursor:pointer;color:var(--signal);text-decoration:underline;text-underline-offset:3px}
+.demo-hand{position:absolute;right:-6px;top:-44px;font-family:var(--hand);font-size:26px;color:var(--signal);transform:rotate(4deg);display:flex;align-items:flex-end;gap:4px;pointer-events:none}
+.demo-hand svg{width:42px;height:42px;transform:translateY(20px)}
+.app-wrap{position:relative}
+@media (max-width:960px){.hero-grid{grid-template-columns:1fr}.demo-hand{right:4px}}
+@media (max-width:480px){.sum b{font-size:26px}.run button{padding:0 12px}.app-body{padding:14px}}
+
+/* ---------- MARQUEE ---------- */
+.marquee{background:var(--ink);color:#fff;overflow:hidden;padding:20px 0}
+.mq{display:flex;width:max-content;animation:mq 40s linear infinite}
+.mq span{font-family:var(--serif);font-size:clamp(28px,4vw,48px);padding:0 26px;white-space:nowrap;display:flex;align-items:center;gap:52px}
+.mq span:nth-child(even){font-style:italic;color:#9fb8ff}
+.mq span::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--signal);box-shadow:0 0 0 6px rgba(47,107,255,.25)}
+@keyframes mq{to{transform:translateX(-50%)}}
+
+/* ---------- PROBLEM ---------- */
+.problem{display:grid;grid-template-columns:1fr 1fr;gap:clamp(40px,6vw,96px);align-items:center}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.cmp{border-radius:12px;padding:24px;min-height:320px;display:flex;flex-direction:column}
+.cmp.bad{background:var(--paper-2);color:var(--text-2)}
+.cmp.good{background:var(--ink);color:#fff}
+.cmp .mono{opacity:.7;margin-bottom:18px}
+.gauge{width:100%;max-width:170px;margin:auto}
+.gauge text{font-family:var(--serif)}
+.cmp.bad p{margin-top:auto;font-size:14px}
+.cmp.good ol{list-style:none;display:flex;flex-direction:column;gap:8px;margin-top:auto}
+.cmp.good li{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;background:var(--ink-3);border-radius:6px;padding:10px}
+.cmp.good li b{font-family:var(--mono);font-size:11px;color:#9fb8ff;font-weight:500;padding-top:1px}
+.cmp-cap{font-family:var(--hand);font-size:22px;margin-top:14px;text-align:center;color:var(--text-2)}
+@media (max-width:960px){.problem{grid-template-columns:1fr}}
+@media (max-width:520px){.compare{grid-template-columns:1fr}}
+
+/* ---------- HOW IT WORKS ---------- */
+.how{background:var(--card);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:64px;position:relative}
+.steps::before{content:"";position:absolute;top:27px;left:28px;right:28px;height:1px;background:var(--line)}
+.steps .fill{position:absolute;top:27px;left:28px;height:1px;background:var(--signal);width:0;transition:width 1.6s cubic-bezier(.7,0,.3,1)}
+.steps.in .fill{width:calc(100% - 56px)}
+.step{padding-right:28px;position:relative}
+.step .n{width:56px;height:56px;border-radius:50%;background:var(--card);border:1px solid var(--line);display:grid;place-items:center;font-family:var(--mono);font-size:13px;position:relative;z-index:2;transition:background .4s,color .4s,border-color .4s}
+.steps.in .step .n{background:var(--ink);color:#fff;border-color:var(--ink)}
+.steps.in .step:nth-child(3) .n{transition-delay:.3s}.steps.in .step:nth-child(4) .n{transition-delay:.7s}.steps.in .step:nth-child(5) .n{transition-delay:1.1s}.steps.in .step:nth-child(6) .n{transition-delay:1.5s}
+.step h3{font-family:var(--serif);font-weight:400;font-size:30px;line-height:1.05;margin-top:26px}
+.step p{margin-top:10px;color:var(--text-2);font-size:15px}
+.step .mono{display:block;margin-top:16px;color:var(--signal)}
+@media (max-width:900px){
+  .steps{grid-template-columns:1fr;gap:36px}
+  .steps::before,.steps .fill{top:28px;bottom:28px;left:27px;right:auto;width:1px;height:auto}
+  .steps .fill{height:0;transition:height 1.6s cubic-bezier(.7,0,.3,1)}
+  .steps.in .fill{width:1px;height:calc(100% - 56px)}
+  .step{display:grid;grid-template-columns:56px 1fr;column-gap:22px;padding-right:0}
+  .step h3{margin-top:10px}
+  .step > :not(.n){grid-column:2}
+  .step .n{grid-row:1/span 3}
+}
+
+/* ---------- HISTORY / CHART ---------- */
+.hist-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:clamp(40px,6vw,96px);align-items:center}
+.chart-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px 24px 16px;position:relative}
+.chart-card h4{font-family:var(--sans);font-weight:600;font-size:15px}
+.chart-card .sub{font-size:13px;color:var(--muted);margin-top:2px}
+.chart-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px}
+.toggle{display:flex;border:1px solid var(--line);border-radius:999px;padding:3px}
+.toggle button{border:0;background:none;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;padding:7px 11px;border-radius:999px;color:var(--muted);cursor:pointer}
+.toggle button.on{background:var(--ink);color:#fff}
+#chart{width:100%;height:auto;display:block;overflow:visible}
+#chart .grid line{stroke:var(--line)}
+#chart .axis text{font-family:var(--mono);font-size:10px;fill:var(--muted)}
+#chart .area{fill:url(#areaGrad)}
+#chart .ln{fill:none;stroke:var(--signal);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#chart .pt{fill:var(--signal);stroke:var(--card);stroke-width:2}
+#chart .xh{stroke:var(--text-2);stroke-width:1;stroke-dasharray:3 3}
+#chart .lbl{font-family:var(--mono);font-size:11px;fill:var(--text)}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:#fff;border-radius:8px;padding:10px 12px;font-size:12px;min-width:170px;opacity:0;transform:translateY(4px);transition:opacity .15s,transform .15s;z-index:5}
+.tip.on{opacity:1;transform:none}
+.tip b{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#9fb8ff;margin-bottom:4px}
+.tip span{display:block;color:#c9ced8}
+.tip strong{font-weight:600;color:#fff}
+.chart-foot{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:12px;color:var(--muted);gap:12px;flex-wrap:wrap}
+.chart-foot button{all:unset;cursor:pointer;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--signal)}
+.tbl{display:none;margin-top:10px;width:100%;border-collapse:collapse;font-size:13px}
+.tbl.on{display:table}
+.tbl th,.tbl td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}
+.tbl th{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.changes{margin-top:28px;display:flex;flex-direction:column;gap:8px}
+.changes div{display:flex;align-items:center;gap:12px;font-size:14px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.changes .tagx{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;padding:3px 7px;border-radius:4px;white-space:nowrap}
+.changes .fixed{color:var(--good);background:#e2f4ec}
+.changes .new{color:var(--high);background:#fbe9e9}
+@media (max-width:960px){.hist-grid{grid-template-columns:1fr}}
+
+/* ---------- PRINCIPLES ---------- */
+.principles{background:var(--ink);color:#fff}
+.principles .eyebrow{color:#8b93a1}
+.principles .h2 em{color:#9fb8ff}
+.pr-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:64px}
+.pr{border:1px solid var(--line-d);border-radius:12px;padding:30px;min-height:300px;display:flex;flex-direction:column;position:relative;overflow:hidden;transition:transform .4s cubic-bezier(.2,.8,.2,1),border-color .3s}
+.pr::before{content:"";position:absolute;inset:0;background:radial-gradient(500px circle at var(--mx,50%) var(--my,50%),rgba(47,107,255,.18),transparent 40%);opacity:0;transition:opacity .3s}
+.pr:hover{transform:translateY(-6px);border-color:rgba(159,184,255,.4)}
+.pr:hover::before{opacity:1}
+.pr .k{font-family:var(--mono);font-size:11px;color:#9fb8ff}
+.pr h3{font-family:var(--serif);font-weight:400;font-size:40px;line-height:1;margin-top:auto}
+.pr p{margin-top:14px;color:#aab0ba;font-size:15px}
+.pr .viz{position:absolute;right:24px;top:24px;width:84px;height:84px;opacity:.9}
+.quote{margin-top:72px;border-top:1px solid var(--line-d);padding-top:40px;display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:start}
+.quote .mark{font-family:var(--serif);font-size:120px;line-height:.7;color:var(--signal)}
+.quote p{font-family:var(--serif);font-size:clamp(26px,3vw,40px);line-height:1.2;max-width:34ch}
+.quote span{display:block;margin-top:14px;font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#8b93a1}
+@media (max-width:960px){.pr-grid{grid-template-columns:1fr}}
+
+/* ---------- ARCHITECTURE ---------- */
+.arch-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:clamp(40px,6vw,96px);align-items:center}
+.diagram{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:clamp(16px,3vw,32px)}
+.diagram svg{width:100%;height:auto;display:block}
+.diagram .box rect{fill:var(--paper);stroke:var(--line);transition:fill .3s,stroke .3s}
+.diagram .box text{font-family:var(--sans);font-size:13px;fill:var(--text);font-weight:600}
+.diagram .box .s{font-family:var(--mono);font-size:9.5px;fill:var(--muted);font-weight:400;letter-spacing:.08em}
+.diagram .box.on rect{fill:var(--signal-soft);stroke:var(--signal)}
+.diagram .edge{stroke:var(--muted);stroke-width:1.4;fill:none}
+.diagram .edge.flow{stroke:var(--signal);stroke-dasharray:5 7;animation:flow 1s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-12}}
+.diagram .box{cursor:pointer}
+.layer-list{margin-top:32px;display:flex;flex-direction:column}
+.layer-list button{all:unset;cursor:pointer;display:grid;grid-template-columns:32px 1fr;gap:12px;padding:16px 0;border-top:1px solid var(--line)}
+.layer-list button:last-child{border-bottom:1px solid var(--line)}
+.layer-list .i{font-family:var(--mono);font-size:11px;color:var(--muted);padding-top:4px}
+.layer-list b{font-family:var(--serif);font-weight:400;font-size:26px;line-height:1.1;display:block}
+.layer-list small{display:block;color:var(--text-2);font-size:14px;max-height:0;overflow:hidden;transition:max-height .4s}
+.layer-list button.on .i{color:var(--signal)}
+.layer-list button.on small{max-height:120px;margin-top:6px}
+.stack{display:flex;gap:8px;flex-wrap:wrap;margin-top:28px}
+.stack span{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);background:var(--card);padding:9px 13px;border-radius:999px}
+@media (max-width:960px){.arch-grid{grid-template-columns:1fr}}
+
+/* ---------- ROLE ---------- */
+.role{background:var(--card);border-top:1px solid var(--line)}
+.role-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(40px,6vw,96px)}
+.dec{list-style:none;counter-reset:d}
+.dec li{counter-increment:d;padding:26px 0;border-top:1px solid var(--line);display:grid;grid-template-columns:48px 1fr;gap:8px}
+.dec li:last-child{border-bottom:1px solid var(--line)}
+.dec li::before{content:"0" counter(d);font-family:var(--mono);font-size:12px;color:var(--signal);padding-top:8px}
+.dec h4{font-family:var(--serif);font-weight:400;font-size:30px;line-height:1.1}
+.dec p{margin-top:8px;color:var(--text-2);font-size:15px;max-width:52ch}
+.dec .vs{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.dec .vs span{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:5px 9px;border-radius:4px}
+.dec .vs .no{background:var(--paper-2);color:var(--muted);text-decoration:line-through}
+.dec .vs .yes{background:var(--signal-soft);color:var(--signal)}
+.role-card{margin-top:36px;display:flex;align-items:center;gap:16px}
+.role-card .av{width:64px;height:64px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-family:var(--serif);font-size:30px}
+.role-card .hand{font-size:36px;line-height:1}
+.role-card .mono{color:var(--muted);margin-top:4px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:28px}
+.chips span{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:9px 13px;border-radius:999px;background:var(--ink);color:#fff}
+@media (max-width:960px){.role-grid{grid-template-columns:1fr}}
+
+/* ---------- CTA ---------- */
+.cta{background:var(--ink);color:#fff;text-align:center;padding:clamp(110px,14vw,200px) 0;position:relative;overflow:hidden}
+.cta .rings{position:absolute;left:50%;top:50%;width:1400px;height:1400px;transform:translate(-50%,-50%);pointer-events:none}
+.cta .rings i{position:absolute;inset:0;margin:auto;border:1px solid rgba(159,184,255,.14);border-radius:50%;animation:ring 6s cubic-bezier(.2,.6,.3,1) infinite;opacity:0}
+.cta .rings i:nth-child(2){animation-delay:2s}.cta .rings i:nth-child(3){animation-delay:4s}
+@keyframes ring{0%{transform:scale(.1);opacity:0}15%{opacity:1}100%{transform:scale(1);opacity:0}}
+.cta .wrap{position:relative}
+.cta h2{font-family:var(--serif);font-weight:400;font-size:clamp(56px,9.5vw,150px);line-height:.9;letter-spacing:-.02em}
+.cta h2 em{color:#9fb8ff}
+.cta p{margin:26px auto 0;max-width:46ch;color:#aab0ba}
+.btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:40px}
+.btn{display:inline-flex;align-items:center;gap:12px;padding:18px 26px;border-radius:999px;text-decoration:none;font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;transition:gap .3s,background .3s,color .3s}
+.btn:hover{gap:22px}
+.btn.primary{background:var(--signal);color:#fff}
+.btn.primary:hover{background:#fff;color:var(--ink)}
+.btn.ghost{border:1px solid rgba(255,255,255,.25);color:#fff}
+.btn.ghost:hover{background:rgba(255,255,255,.08)}
+footer{background:var(--ink);color:#8b93a1;border-top:1px solid var(--line-d);padding:26px 0}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .reveal{opacity:1;transform:none}
+  .hero h1 em svg path{stroke-dashoffset:0}
+  .opp{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="logo" viewBox="0 0 40 40">
+    <circle cx="20" cy="26" r="3.2" fill="currentColor"/>
+    <path d="M12.5 19.5a10.5 10.5 0 0 1 15 0" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>
+    <path d="M7 14a18 18 0 0 1 26 0" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" opacity=".55"/>
+  </symbol>
+</svg>
+
+<!-- ============ HERO ============ -->
+<header class="hero" id="top">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="tags">
+        <a class="tag live" href="https://site-signal-phi.vercel.app/" target="_blank" rel="noopener"><i></i>Live on Vercel</a>
+        <span class="tag">Full-stack product</span>
+        <span class="tag">Design + build</span>
+      </div>
+      <div class="brandline"><svg><use href="#logo"/></svg><b>SiteSignal</b></div>
+      <h1>Know what to fix <em>next.<svg viewBox="0 0 200 20" preserveAspectRatio="none"><path d="M3 14 C 50 4, 120 4, 197 12" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round"/></svg></em></h1>
+      <p class="lede">SiteSignal crawls your website, finds the technical and on-page SEO problems holding back your rankings, and turns them into a prioritized list of what to fix first.</p>
+      <span class="hero-note">a little clarity for your corner of the web ✦</span>
+      <div class="hero-meta">
+        <div><b>100</b><span>Pages per crawl</span></div>
+        <div><b>0</b><span>Plugins to install</span></div>
+        <div><b>1</b><span>Ranked to-do list</span></div>
+      </div>
+    </div>
+
+    <div class="app-wrap">
+      <div class="demo-hand">try it
+        <svg viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M40 4C30 16 20 26 8 40"/><path d="M8 40l2-11M8 40l11-2"/></svg>
+      </div>
+      <div class="app" id="app">
+        <div class="app-bar"><i></i><i></i><i></i><span class="url" id="appUrl">sitesignal · new audit</span><span class="demo">Demo</span></div>
+        <div class="app-body">
+          <form class="run" id="runForm" autocomplete="off">
+            <label for="urlIn">Website URL</label>
+            <input id="urlIn" value="yourcornerstore.ca" spellcheck="false" aria-label="Website URL">
+            <button id="runBtn" type="submit">Audit →</button>
+          </form>
+          <div class="state" id="state">
+            <div class="idle">
+              <div class="radar"></div>
+              <p>Enter any homepage and run an audit.</p>
+              <span class="mono">Simulated crawl · sample findings</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="marquee" aria-hidden="true">
+  <div class="mq" id="mq">
+    <span>Real crawl data</span><span>Deterministic analysis</span><span>No guesswork</span><span>Ranked by impact</span><span>Every audit saved</span>
+  </div>
+</div>
+
+<!-- ============ PROBLEM ============ -->
+<section class="pad">
+  <div class="wrap problem">
+    <div>
+      <div class="eyebrow mono reveal">01 — The problem</div>
+      <h2 class="h2 reveal d1">A score tells you <em>how bad.</em> Not what to do.</h2>
+      <p class="lede reveal d2" style="margin-top:28px">Most SEO tools hand small site owners a number out of 100 and a wall of warnings. That's a grade, not a plan. SiteSignal starts from what's actually on your pages and ends with a short, ordered list of fixes.</p>
+    </div>
+    <div class="reveal d2">
+      <div class="compare">
+        <div class="cmp bad">
+          <span class="mono">Typical SEO tool</span>
+          <svg class="gauge" viewBox="0 0 120 80" aria-label="A generic score of 62 out of 100">
+            <path d="M10 70 A50 50 0 0 1 110 70" fill="none" stroke="rgba(16,19,26,.12)" stroke-width="10" stroke-linecap="round"/>
+            <path d="M10 70 A50 50 0 0 1 90 30" fill="none" stroke="#7b8290" stroke-width="10" stroke-linecap="round"/>
+            <text x="60" y="66" text-anchor="middle" font-size="30" fill="#4a5160">62</text>
+          </svg>
+          <p>“Your site scores 62.” …so what do I fix first?</p>
+        </div>
+        <div class="cmp good">
+          <span class="mono">SiteSignal</span>
+          <ol>
+            <li><b>01</b>Fix 4 broken internal links</li>
+            <li><b>02</b>Add titles to 7 pages</li>
+            <li><b>03</b>Write 12 meta descriptions</li>
+          </ol>
+        </div>
+      </div>
+      <p class="cmp-cap">same site, different question ↑</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section class="pad how" id="how">
+  <div class="wrap">
+    <div class="eyebrow mono reveal">02 — How it works</div>
+    <h2 class="h2 reveal d1">URL in. <em>Priorities out.</em></h2>
+    <div class="steps" id="steps">
+      <div class="fill"></div>
+      <div class="step">
+        <div class="n">01</div>
+        <h3>Connect your website</h3>
+        <p>Enter your homepage URL — no code, no plugin to install.</p>
+        <span class="mono">Input · 1 URL</span>
+      </div>
+      <div class="step">
+        <div class="n">02</div>
+        <h3>We crawl and analyze it</h3>
+        <p>We crawl up to 100 pages and run a deterministic set of technical and on-page SEO checks.</p>
+        <span class="mono">Crawl · ≤100 pages</span>
+      </div>
+      <div class="step">
+        <div class="n">03</div>
+        <h3>Get prioritized opportunities</h3>
+        <p>Issues are grouped and ranked by real impact, so you know exactly what to fix first.</p>
+        <span class="mono">Output · Ranked list</span>
+      </div>
+      <div class="step">
+        <div class="n">04</div>
+        <h3>Track improvements</h3>
+        <p>Every audit is saved, so you can see what changed after each fix.</p>
+        <span class="mono">History · Every audit</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HISTORY ============ -->
+<section class="pad" id="history">
+  <div class="wrap hist-grid">
+    <div>
+      <div class="eyebrow mono reveal">03 — Progress over time</div>
+      <h2 class="h2 reveal d1">Fix it, re-run it, <em>see it move.</em></h2>
+      <p class="lede reveal d2" style="margin-top:28px">Because every audit is stored, SiteSignal can show exactly what changed between runs — which issues you closed, and which new ones appeared — instead of a score that drifts for reasons nobody can explain.</p>
+      <div class="changes reveal d3">
+        <div><span class="tagx fixed">Fixed</span>Broken internal links · 4 pages</div>
+        <div><span class="tagx fixed">Fixed</span>Missing page titles · 7 pages</div>
+        <div><span class="tagx new">New</span>Images missing alt text · 3 pages</div>
+      </div>
+    </div>
+    <div class="chart-card reveal d2" id="chartCard">
+      <div class="chart-top">
+        <div><h4>Open issues per audit</h4><div class="sub">Sample site · six audits</div></div>
+        <div class="toggle" id="metricToggle">
+          <button class="on" data-m="issues">Issues</button>
+          <button data-m="pages">Pages affected</button>
+        </div>
+      </div>
+      <svg id="chart" viewBox="0 0 560 280" role="img" aria-label="Line chart of open issues across six audits, falling over time">
+        <defs><linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2f6bff" stop-opacity=".16"/><stop offset="1" stop-color="#2f6bff" stop-opacity="0"/></linearGradient></defs>
+        <g class="grid"></g><g class="axis"></g>
+        <path class="area"/><path class="ln"/>
+        <line class="xh" y1="16" y2="244" style="display:none"/>
+        <g class="pts"></g>
+        <text class="lbl" text-anchor="start"></text>
+        <rect class="hit" x="40" y="0" width="510" height="250" fill="transparent"/>
+      </svg>
+      <div class="tip" id="tip"></div>
+      <div class="chart-foot"><span>Illustrative data for the demo</span><button id="tblBtn">Show table</button></div>
+      <table class="tbl" id="tbl"><thead><tr><th>Audit</th><th>Date</th><th>Issues</th><th>Pages affected</th></tr></thead><tbody></tbody></table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PRINCIPLES ============ -->
+<section class="pad principles">
+  <div class="wrap">
+    <div class="eyebrow mono reveal">04 — What makes it different</div>
+    <h2 class="h2 reveal d1">Real crawl data. Deterministic analysis. <em>No guesswork.</em></h2>
+    <div class="pr-grid">
+      <div class="pr reveal">
+        <svg class="viz" viewBox="0 0 84 84" fill="none" stroke="#9fb8ff" stroke-width="1.4"><rect x="10" y="12" width="28" height="20" rx="3"/><rect x="46" y="12" width="28" height="20" rx="3"/><rect x="10" y="52" width="28" height="20" rx="3"/><rect x="46" y="52" width="28" height="20" rx="3" stroke-dasharray="3 3"/><path d="M38 22h8M24 32v20M60 32v20"/></svg>
+        <span class="k">01</span>
+        <h3>Real crawl data</h3>
+        <p>Every finding comes from pages SiteSignal actually fetched on your site — not estimates, not industry averages.</p>
+      </div>
+      <div class="pr reveal d1">
+        <svg class="viz" viewBox="0 0 84 84" fill="none" stroke="#9fb8ff" stroke-width="1.4"><path d="M12 42h18l6-14 12 28 6-14h18"/><circle cx="12" cy="42" r="3" fill="#9fb8ff"/><circle cx="72" cy="42" r="3" fill="#9fb8ff"/></svg>
+        <span class="k">02</span>
+        <h3>Deterministic analysis</h3>
+        <p>The same site produces the same results. A fixed set of checks means changes in your audit reflect changes on your site.</p>
+      </div>
+      <div class="pr reveal d2">
+        <svg class="viz" viewBox="0 0 84 84" fill="none" stroke="#9fb8ff" stroke-width="1.4"><circle cx="42" cy="42" r="26"/><path d="M42 30v14l9 6"/><path d="M42 16v-4M42 72v-4M16 42h-4M72 42h-4"/></svg>
+        <span class="k">03</span>
+        <h3>Reasoning shown</h3>
+        <p>Each recommendation traces back to what was found, with the reasoning alongside it — so you can trust it, and explain it.</p>
+      </div>
+    </div>
+    <div class="quote reveal">
+      <div class="mark">“</div>
+      <div>
+        <p>SiteSignal isn't a generic SEO score generator — every recommendation traces back to something we actually found on your site.</p>
+        <span>Product principle</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ARCHITECTURE ============ -->
+<section class="pad" id="build">
+  <div class="wrap arch-grid">
+    <div>
+      <div class="eyebrow mono reveal">05 — Under the hood</div>
+      <h2 class="h2 reveal d1">Built <em>end to end.</em></h2>
+      <p class="lede reveal d2" style="margin-top:24px">A Next.js frontend talks to an API that runs the crawl and the check engine, then stores every audit in Postgres so history is a query, not a guess.</p>
+      <div class="layer-list reveal d3" id="layers">
+        <button class="on" data-k="web"><span class="i">01</span><span><b>Web app</b><small>Next.js landing page, auth (register / log in) and the audit dashboard, deployed on Vercel.</small></span></button>
+        <button data-k="api"><span class="i">02</span><span><b>API</b><small>Receives an audit request, kicks off the crawl and returns results to the dashboard.</small></span></button>
+        <button data-k="crawl"><span class="i">03</span><span><b>Crawler + checks</b><small>Follows internal links up to 100 pages and runs the same fixed set of technical and on-page checks on each one.</small></span></button>
+        <button data-k="db"><span class="i">04</span><span><b>Postgres</b><small>Stores users, audits, pages and issues, so every run can be compared with the last.</small></span></button>
+      </div>
+      <div class="stack reveal"><span>Next.js</span><span>Postgres</span><span>Vercel</span></div>
+    </div>
+    <div class="diagram reveal d2">
+      <svg viewBox="0 0 520 420" id="diag" aria-label="Architecture diagram: web app, API, crawler and check engine, Postgres">
+        <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#7b8290"/></marker></defs>
+        <!-- edges -->
+        <path class="edge" d="M140 78 H 250" marker-end="url(#ah)"/>
+        <path class="edge flow" d="M380 110 V 170" marker-end="url(#ah)"/>
+        <path class="edge" d="M380 250 V 310" marker-end="url(#ah)"/>
+        <path class="edge" d="M300 340 H 190 V 110" marker-end="url(#ah)"/>
+        <text x="195" y="68" font-family="JetBrains Mono" font-size="9" fill="#7b8290" text-anchor="middle">POST /audit</text>
+        <text x="392" y="144" font-family="JetBrains Mono" font-size="9" fill="#7b8290">crawl</text>
+        <text x="392" y="284" font-family="JetBrains Mono" font-size="9" fill="#7b8290">save</text>
+        <text x="245" y="360" font-family="JetBrains Mono" font-size="9" fill="#7b8290" text-anchor="middle">history</text>
+        <!-- boxes -->
+        <g class="box on" data-k="web"><rect x="20" y="46" width="120" height="64" rx="10"/><text x="80" y="76" text-anchor="middle">Web app</text><text class="s" x="80" y="94" text-anchor="middle">NEXT.JS · VERCEL</text></g>
+        <g class="box" data-k="api"><rect x="250" y="46" width="250" height="64" rx="10"/><text x="375" y="76" text-anchor="middle">API</text><text class="s" x="375" y="94" text-anchor="middle">AUDIT REQUESTS · RESULTS</text></g>
+        <g class="box" data-k="crawl"><rect x="250" y="170" width="250" height="80" rx="10"/><text x="375" y="202" text-anchor="middle">Crawler + check engine</text><text class="s" x="375" y="222" text-anchor="middle">≤100 PAGES · FIXED CHECKS</text></g>
+        <g class="box" data-k="db"><rect x="300" y="310" width="200" height="64" rx="10"/><text x="400" y="340" text-anchor="middle">Postgres</text><text class="s" x="400" y="358" text-anchor="middle">AUDITS · PAGES · ISSUES</text></g>
+        <!-- site being crawled -->
+        <g opacity=".9">
+          <rect x="20" y="190" width="150" height="100" rx="8" fill="none" stroke="#2f6bff" stroke-dasharray="4 4"/>
+          <text x="95" y="212" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#2f6bff">YOUR WEBSITE</text>
+          <g fill="#dfe8ff" stroke="#2f6bff" stroke-width=".8"><rect x="36" y="224" width="30" height="22" rx="3"/><rect x="80" y="224" width="30" height="22" rx="3"/><rect x="124" y="224" width="30" height="22" rx="3"/><rect x="58" y="256" width="30" height="22" rx="3"/><rect x="102" y="256" width="30" height="22" rx="3"/></g>
+        </g>
+        <path class="edge flow" d="M250 212 H 176" marker-end="url(#ah)"/>
+        <text x="213" y="204" font-family="JetBrains Mono" font-size="9" fill="#7b8290" text-anchor="middle">fetch</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ROLE ============ -->
+<section class="pad role" id="role">
+  <div class="wrap role-grid">
+    <div>
+      <div class="eyebrow mono reveal">06 — My role</div>
+      <h2 class="h2 reveal d1">Product, design <em>and code.</em></h2>
+      <p class="lede reveal d2" style="margin-top:24px">I designed and built SiteSignal from the ground up — the product thinking, the interface and the full stack behind it. The goal was an SEO tool a small business owner could open once and immediately know where to start.</p>
+      <div class="chips reveal d3"><span>Product strategy</span><span>UX / UI</span><span>Frontend</span><span>Backend</span><span>Database</span><span>Deployment</span></div>
+      <div class="role-card reveal d3">
+        <div class="av">F</div>
+        <div><div class="hand">Feyza Gulbent</div><div class="mono">Designer &amp; developer</div></div>
+      </div>
+    </div>
+    <ol class="dec reveal d2">
+      <li><div><h4>Priorities over scores</h4><p>The core output is an ordered list, not a grade. Everything in the dashboard serves the question "what do I fix first?"</p><div class="vs"><span class="no">Score / 100</span><span class="yes">Ranked fixes</span></div></div></li>
+      <li><div><h4>Explain every finding</h4><p>Each issue carries its reasoning and the pages it was found on, so recommendations are checkable instead of mysterious.</p><div class="vs"><span class="no">Black box</span><span class="yes">Reasoning shown</span></div></div></li>
+      <li><div><h4>Zero-install onboarding</h4><p>A URL is the only input. No code snippet, no plugin — the first audit is one step away from sign-up.</p><div class="vs"><span class="no">Install plugin</span><span class="yes">Paste a URL</span></div></div></li>
+      <li><div><h4>Deterministic by design</h4><p>A fixed check set makes audits comparable run to run, which is what makes progress tracking meaningful.</p><div class="vs"><span class="no">Fuzzy estimates</span><span class="yes">Same input, same output</span></div></div></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ CTA ============ -->
+<section class="cta">
+  <div class="rings"><i></i><i></i><i></i></div>
+  <div class="wrap">
+    <h2 class="reveal">Audit your<br><em>website.</em></h2>
+    <p class="reveal d1">SiteSignal is live. Paste a homepage and get your first prioritized list in minutes.</p>
+    <div class="btns reveal d2">
+      <a class="btn primary" href="https://site-signal-phi.vercel.app/" target="_blank" rel="noopener">Visit SiteSignal <span>→</span></a>
+      <a class="btn ghost" href="#top">Try the demo again <span>↑</span></a>
+    </div>
+  </div>
+</section>
+<footer><div class="wrap mono" style="font-size:10px"><span>SiteSignal</span><span>Case study · Feyza Gulbent</span></div></footer>
+
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = s => document.querySelector(s);
+
+  // marquee
+  const mq = $('#mq'); mq.innerHTML += mq.innerHTML;
+
+  // reveal
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), {threshold:.12});
+  document.querySelectorAll('.reveal, #steps').forEach(el => io.observe(el));
+
+  // spotlight
+  document.querySelectorAll('.pr').forEach(c => c.addEventListener('pointermove', e => {
+    const r = c.getBoundingClientRect(); c.style.setProperty('--mx', e.clientX - r.left + 'px'); c.style.setProperty('--my', e.clientY - r.top + 'px');
+  }));
+
+  /* ============ DEMO AUDIT ============ */
+  // Seeded PRNG: the same URL always produces the same audit (deterministic, like the real thing).
+  const hash = s => { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
+  const rng = seed => () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+
+  const CHECKS = [
+    {t:'Broken internal links', sev:'high', w:10, why:'Links that return 4xx errors waste crawl budget and send visitors to dead ends. Search engines treat them as a sign of a poorly maintained site.'},
+    {t:'Pages missing a title tag', sev:'high', w:9, why:'The title is the headline shown in search results. Without one, search engines guess — usually badly — and click-through suffers.'},
+    {t:'Pages blocked by noindex', sev:'high', w:8, why:'These pages tell search engines not to index them. If that wasn\'t intentional, they can\'t rank at all.'},
+    {t:'Duplicate title tags', sev:'med', w:7, why:'When several pages share a title, search engines struggle to tell them apart and may rank the wrong one.'},
+    {t:'Missing meta descriptions', sev:'med', w:6, why:'The meta description is your pitch in the search results. Without it, a random snippet of page text is shown instead.'},
+    {t:'Missing H1 heading', sev:'med', w:5, why:'The H1 signals what the page is about to both readers and crawlers. Pages without one lose a clear topical signal.'},
+    {t:'Redirect chains', sev:'med', w:5, why:'Each extra hop slows the page down and dilutes link signals. Point links straight at the final URL.'},
+    {t:'Images without alt text', sev:'low', w:3, why:'Alt text makes images accessible to screen readers and helps images appear in image search.'},
+    {t:'Title tags too long', sev:'low', w:2, why:'Titles past roughly 60 characters get cut off in results, hiding the part that might earn the click.'},
+    {t:'Thin content', sev:'low', w:2, why:'Pages with very little text give search engines little to understand and rarely rank for anything useful.'}
+  ];
+  const PATHS = ['/','/about','/contact','/shop','/services','/blog','/pricing','/faq','/team','/careers','/blog/getting-started','/blog/spring-update','/products/gift-card','/products/new','/events','/gallery','/menu','/locations','/privacy','/terms','/book','/press'];
+  const LABEL = {high:'High impact', med:'Medium', low:'Low'};
+
+  const state = $('#state'), btn = $('#runBtn'), input = $('#urlIn'), appUrl = $('#appUrl');
+  const clean = u => u.trim().replace(/^https?:\/\//,'').replace(/\/.*$/,'').toLowerCase() || 'example.com';
+  let timer;
+
+  function audit(domain) {
+    const r = rng(hash(domain));
+    const pages = 38 + Math.floor(r() * 63); // 38–100
+    const found = CHECKS.map(c => {
+      if (r() < 0.25) return null;
+      const n = 1 + Math.floor(r() * Math.max(2, pages * (c.sev === 'low' ? .35 : .18)));
+      const on = [...PATHS].sort(() => r() - .5).slice(0, Math.min(3, n));
+      return {...c, n, on, score: c.w * Math.log2(n + 1)};
+    }).filter(Boolean).sort((a, b) => b.score - a.score);
+    return {pages, found, total: found.reduce((s, f) => s + f.n, 0)};
+  }
+
+  function run(e) {
+    e && e.preventDefault();
+    clearInterval(timer);
+    const domain = clean(input.value); input.value = domain;
+    appUrl.textContent = 'sitesignal · auditing ' + domain;
+    const res = audit(domain);
+    btn.disabled = true;
+    state.innerHTML = `<div class="crawl-head"><b><span id="pc">0</span> <span style="color:var(--muted);font-size:.6em">/ ${res.pages} pages</span></b><span class="mono" style="color:var(--signal)">Crawling</span></div>
+      <div class="bar"><span id="pb"></span></div><div class="log" id="log"></div>`;
+    const log = $('#log'), pc = $('#pc'), pb = $('#pb');
+    const r = rng(hash(domain) ^ 99);
+    let i = 0; const step = reduce ? res.pages : Math.max(1, Math.round(res.pages / 45));
+    const line = h => { const d = document.createElement('div'); d.innerHTML = h; log.appendChild(d); while (log.children.length > 14) log.firstChild.remove(); };
+    line(`<span class="dim">→ resolving https://${domain}</span>`);
+    timer = setInterval(() => {
+      for (let k = 0; k < step && i < res.pages; k++, i++) {
+        const p = PATHS[Math.floor(r() * PATHS.length)] + (r() < .4 ? '' : '/' + (100 + Math.floor(r() * 900)));
+        const ms = 80 + Math.floor(r() * 520), roll = r();
+        const code = roll < .05 ? `<span class="err">404</span>` : roll < .12 ? `<span class="warn">301</span>` : `<span class="ok">200</span>`;
+        if (k === 0) line(`${code} GET ${p} <span class="dim">${ms}ms</span>`);
+      }
+      pc.textContent = i; pb.style.width = (i / res.pages * 100) + '%';
+      if (i >= res.pages) {
+        clearInterval(timer);
+        line(`<span class="dim">→ running checks on ${res.pages} pages…</span>`);
+        line(`<span class="ok">✓ ${res.found.length} issue types · ranked by impact</span>`);
+        setTimeout(() => show(domain, res), reduce ? 0 : 700);
+      }
+    }, 55);
+  }
+
+  function show(domain, res) {
+    btn.disabled = false;
+    appUrl.textContent = 'sitesignal · ' + domain + ' · audit #1';
+    const high = res.found.filter(f => f.sev === 'high').length;
+    state.innerHTML = `
+      <div class="sum">
+        <div><b>${res.pages}</b><span>Pages crawled</span></div>
+        <div><b>${res.total}</b><span>Issues found</span></div>
+        <div><b style="color:var(--high)">${high}</b><span>High impact</span></div>
+      </div>
+      <div class="opp-head"><span class="mono">Fix these first</span><span class="mono">Pages</span></div>
+      <div class="opps">${res.found.map((f, idx) => `
+        <div class="opp${idx === 0 ? ' open' : ''}" style="animation-delay:${idx * 70}ms">
+          <button aria-expanded="${idx === 0}"><span class="rank">${String(idx + 1).padStart(2,'0')}</span>
+            <span class="t">${f.t}<small>${f.n} page${f.n > 1 ? 's' : ''} affected</small></span>
+            <span class="sev ${f.sev}">${LABEL[f.sev]}</span></button>
+          <div class="why"><div class="why-in"><span class="mono">Why it matters</span>${f.why}<span class="mono">Found on</span>${f.on.map(p => `<code>${p}</code>`).join('')}${f.n > f.on.length ? `<code>+${f.n - f.on.length} more</code>` : ''}</div></div>
+        </div>`).join('')}
+      </div>
+      <div class="again">same URL, same result — <button id="againBtn">run it again</button></div>`;
+    state.querySelectorAll('.opp button').forEach(b => b.addEventListener('click', () => {
+      const o = b.parentElement, open = o.classList.toggle('open'); b.setAttribute('aria-expanded', open);
+    }));
+    $('#againBtn').onclick = () => run();
+  }
+  $('#runForm').addEventListener('submit', run);
+
+  // auto-run once when the demo scrolls into view
+  let auto = false;
+  new IntersectionObserver(es => { if (es[0].isIntersecting && !auto) { auto = true; setTimeout(run, 700); } }, {threshold:.5}).observe($('#app'));
+
+  /* ============ HISTORY CHART ============ */
+  const DATA = [
+    {a:'Audit 1', d:'Jan 12', issues:48, pages:31},
+    {a:'Audit 2', d:'Feb 02', issues:41, pages:27},
+    {a:'Audit 3', d:'Feb 23', issues:33, pages:22},
+    {a:'Audit 4', d:'Mar 16', issues:29, pages:19},
+    {a:'Audit 5', d:'Apr 06', issues:19, pages:13},
+    {a:'Audit 6', d:'Apr 27', issues:14, pages:9}
+  ];
+  const svg = $('#chart'), tip = $('#tip'), card = $('#chartCard');
+  const W = 560, H = 280, L = 40, R = 84, T = 16, B = 36;
+  let metric = 'issues';
+  const x = i => L + i * (W - L - R) / (DATA.length - 1);
+  const draw = () => {
+    const max = Math.ceil(Math.max(...DATA.map(d => d[metric])) / 10) * 10 + 10;
+    const y = v => T + (1 - v / max) * (H - T - B);
+    const ticks = [0, max / 4, max / 2, max * 3 / 4, max];
+    svg.querySelector('.grid').innerHTML = ticks.map(t => `<line x1="${L}" x2="${W - R}" y1="${y(t)}" y2="${y(t)}"/>`).join('');
+    svg.querySelector('.axis').innerHTML = ticks.map(t => `<text x="${L - 8}" y="${y(t) + 3}" text-anchor="end">${t}</text>`).join('') +
+      DATA.map((d, i) => `<text x="${x(i)}" y="${H - 12}" text-anchor="middle">${d.d}</text>`).join('');
+    const pts = DATA.map((d, i) => [x(i), y(d[metric])]);
+    const line = pts.map((p, i) => (i ? 'L' : 'M') + p[0] + ' ' + p[1]).join(' ');
+    svg.querySelector('.ln').setAttribute('d', line);
+    svg.querySelector('.area').setAttribute('d', line + ` L ${x(DATA.length - 1)} ${y(0)} L ${x(0)} ${y(0)} Z`);
+    svg.querySelector('.pts').innerHTML = pts.map(p => `<circle class="pt" cx="${p[0]}" cy="${p[1]}" r="4.5"/>`).join('');
+    const last = pts[pts.length - 1], first = DATA[0][metric], lastV = DATA[DATA.length - 1][metric];
+    const lbl = svg.querySelector('.lbl'); lbl.setAttribute('x', last[0] + 12); lbl.setAttribute('y', last[1] + 4);
+    lbl.textContent = `${lastV} · −${Math.round((1 - lastV / first) * 100)}%`;
+    svg.dataset.max = max;
+  };
+  draw();
+  const ln = svg.querySelector('.ln'); const len = ln.getTotalLength();
+  if (!reduce) { ln.style.strokeDasharray = len; ln.style.strokeDashoffset = len; ln.style.transition = 'stroke-dashoffset 1.6s cubic-bezier(.7,0,.3,1)';
+    new IntersectionObserver((es, o) => { if (es[0].isIntersecting) { ln.style.strokeDashoffset = 0; o.disconnect(); setTimeout(() => { ln.style.strokeDasharray = ''; ln.style.transition = ''; }, 1700); } }, {threshold:.4}).observe(svg); }
+
+  document.querySelectorAll('#metricToggle button').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('#metricToggle button').forEach(x => x.classList.remove('on')); b.classList.add('on');
+    metric = b.dataset.m; draw();
+    svg.setAttribute('aria-label', `Line chart of ${metric === 'issues' ? 'open issues' : 'pages affected'} across six audits`);
+    card.querySelector('h4').textContent = metric === 'issues' ? 'Open issues per audit' : 'Pages affected per audit';
+  }));
+
+  const xh = svg.querySelector('.xh'), hit = svg.querySelector('.hit');
+  const hover = e => {
+    const r = svg.getBoundingClientRect(), sx = (e.clientX - r.left) * W / r.width;
+    const i = Math.max(0, Math.min(DATA.length - 1, Math.round((sx - L) / ((W - L - R) / (DATA.length - 1)))));
+    const d = DATA[i], prev = DATA[i - 1];
+    xh.style.display = ''; xh.setAttribute('x1', x(i)); xh.setAttribute('x2', x(i));
+    svg.querySelectorAll('.pt').forEach((p, k) => p.setAttribute('r', k === i ? 6.5 : 4.5));
+    const diff = prev ? d[metric] - prev[metric] : null;
+    tip.innerHTML = `<b>${d.a} · ${d.d}</b><span><strong>${d.issues}</strong> open issues</span><span><strong>${d.pages}</strong> pages affected</span>${diff !== null ? `<span>${diff <= 0 ? '▼' : '▲'} ${Math.abs(diff)} vs previous</span>` : ''}`;
+    const cr = card.getBoundingClientRect(), px = x(i) * r.width / W + r.left - cr.left;
+    tip.style.left = Math.min(cr.width - 190, Math.max(10, px + 14)) + 'px';
+    tip.style.top = (r.top - cr.top + 30) + 'px';
+    tip.classList.add('on');
+  };
+  hit.addEventListener('pointermove', hover);
+  hit.addEventListener('pointerleave', () => { tip.classList.remove('on'); xh.style.display = 'none'; svg.querySelectorAll('.pt').forEach(p => p.setAttribute('r', 4.5)); });
+
+  const tbl = $('#tbl');
+  tbl.querySelector('tbody').innerHTML = DATA.map(d => `<tr><td>${d.a}</td><td>${d.d}</td><td>${d.issues}</td><td>${d.pages}</td></tr>`).join('');
+  $('#tblBtn').onclick = e => { const on = tbl.classList.toggle('on'); e.target.textContent = on ? 'Hide table' : 'Show table'; };
+
+  /* ============ ARCHITECTURE ============ */
+  const setLayer = k => {
+    document.querySelectorAll('#layers button').forEach(b => b.classList.toggle('on', b.dataset.k === k));
+    document.querySelectorAll('#diag .box').forEach(b => b.classList.toggle('on', b.dataset.k === k));
+  };
+  document.querySelectorAll('#layers button, #diag .box').forEach(el => el.addEventListener('click', () => setLayer(el.dataset.k)));
+})();
+</script>
+</body>
+</html>

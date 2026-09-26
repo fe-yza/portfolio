@@ -1,0 +1,373 @@
+<title>FocusUp Case Study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --ground:#ffffff;
+  --surface:#f5f7fd;
+  --ink:#121634;
+  --muted:#565c7d;
+  --line:#e3e6f2;
+  --accent:#4a5ae0;
+  --teal:#2f93a4;
+  --pblue:#e2e8ff;
+  --pgreen:#dcf3e8;
+  --pgreen-ink:#1d6b4f;
+  --placeholder:#fff4d6;
+  --placeholder-ink:#7a5a00;
+  --stage-a:#0c0d1c;
+  --stage-b:#1a1e63;
+  --display:"Bricolage Grotesque", "Figtree", system-ui, sans-serif;
+  --body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ground:#0b0e22; --surface:#131836; --ink:#eef0ff; --muted:#a2a8cc; --line:#262c56;
+    --accent:#8e9bff; --teal:#6fcad6; --pblue:#1b2357; --pgreen:#12372f; --pgreen-ink:#8fe0bd;
+    --placeholder:#3a2f0e; --placeholder-ink:#f2d27a;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#0b0e22; --surface:#131836; --ink:#eef0ff; --muted:#a2a8cc; --line:#262c56;
+  --accent:#8e9bff; --teal:#6fcad6; --pblue:#1b2357; --pgreen:#12372f; --pgreen-ink:#8fe0bd;
+  --placeholder:#3a2f0e; --placeholder-ink:#f2d27a;
+}
+
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding-inline:clamp(16px,4vw,40px)}
+h1,h2,h3{font-family:var(--display);line-height:1.08;margin:0;text-wrap:balance;letter-spacing:-0.02em}
+p{margin:0}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+a{color:inherit}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+.todo{background:var(--placeholder);color:var(--placeholder-ink);border-radius:6px;padding:1px 8px;font-family:var(--mono);font-size:.8em;white-space:nowrap}
+
+/* top bar */
+.crumbs{display:flex;justify-content:space-between;align-items:center;gap:16px;padding-block:24px}
+.crumbs a{text-decoration:none;font-weight:500;font-size:15px}
+.crumbs a:hover{color:var(--accent)}
+
+/* hero */
+.hero{padding-block:clamp(32px,6vw,72px) 40px;display:grid;gap:28px}
+.hero h1{font-size:clamp(64px,13vw,156px);font-weight:800;letter-spacing:-0.045em}
+.hero h1 span{background:linear-gradient(95deg,var(--accent),var(--teal));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{font-size:clamp(20px,2.4vw,26px);line-height:1.4;max-width:30ch;font-family:var(--display);font-weight:400;letter-spacing:-0.01em}
+.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:20px 32px;border-top:1px solid var(--line);padding-top:24px;margin-top:8px}
+.meta dt{margin-bottom:4px}
+.meta dd{margin:0;font-weight:500;font-size:16px;line-height:1.45}
+
+/* stage */
+.stage{background:radial-gradient(120% 90% at 50% 110%, #2c3aa8 0%, transparent 55%),linear-gradient(180deg,var(--stage-a),var(--stage-b));color:#eef0ff;border-radius:28px;overflow:hidden}
+.stage-scroll{overflow-x:auto;scrollbar-width:thin}
+.phones{display:flex;gap:clamp(14px,2vw,24px);justify-content:safe center;align-items:flex-start;padding:clamp(32px,5vw,64px) clamp(20px,3vw,40px);width:max-content;min-width:100%}
+.phones figure{margin:0;flex:0 0 auto;width:clamp(150px,15vw,172px);transition:transform .4s ease}
+.phones figure:nth-child(even){margin-top:36px}
+.phones img{display:block;width:100%;height:auto;filter:drop-shadow(0 24px 40px rgba(0,0,0,.45))}
+.phones figcaption{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#aab2e6;text-align:center;margin-top:14px}
+@media (hover:hover){.phones figure:hover{transform:translateY(-8px)}}
+.stage-note{font-size:13px;color:var(--muted);margin-top:12px}
+
+/* sections */
+section.block{padding-block:clamp(56px,8vw,104px);border-bottom:1px solid var(--line)}
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:24px 56px}
+.split h2{font-size:clamp(30px,4vw,44px);font-weight:600}
+.prose{display:grid;gap:18px;max-width:64ch;color:var(--ink)}
+.prose p{color:var(--muted)}
+.prose strong{color:var(--ink);font-weight:600}
+@media (max-width:760px){.split{grid-template-columns:1fr}}
+
+/* problem statement */
+.hmw{margin-top:8px;padding:22px 24px;border-radius:18px;background:var(--pblue);font-family:var(--display);font-size:clamp(20px,2.4vw,24px);line-height:1.35;font-weight:600;color:var(--ink)}
+.hmw .label{display:block;margin-bottom:8px;color:var(--accent)}
+
+/* goals */
+.goals{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0;margin-top:40px;border-top:1px solid var(--line)}
+.goal{padding:24px 24px 8px 0;display:grid;gap:10px;align-content:start}
+.goal+.goal{padding-left:24px;border-left:1px solid var(--line)}
+@media (max-width:820px){.goal+.goal{padding-left:0;border-left:0;border-top:1px solid var(--line)}}
+.goal h3{font-size:22px;font-weight:600}
+.goal p{color:var(--muted);font-size:16px}
+.goal .where{font-family:var(--mono);font-size:12px;color:var(--teal)}
+
+/* flow */
+.flow-scroll{overflow-x:auto;margin-top:40px;padding-bottom:8px}
+.flow{display:flex;align-items:stretch;gap:0;min-width:760px}
+.step{flex:1;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 16px 18px;display:grid;gap:4px;align-content:start}
+.step .n{font-family:var(--mono);font-size:12px;color:var(--accent)}
+.step b{font-family:var(--display);font-weight:600;font-size:18px}
+.step span{font-size:14px;color:var(--muted);line-height:1.4}
+.arrow{flex:0 0 36px;display:grid;place-items:center;color:var(--muted)}
+.loop{min-width:760px;display:flex;justify-content:flex-end;padding-right:6%;margin-top:10px}
+.loop svg{width:78%;height:40px;overflow:visible}
+.loop text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
+
+/* screens */
+.screen{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(28px,6vw,88px);align-items:center;padding-block:clamp(40px,6vw,72px)}
+.screen+.screen{border-top:1px dashed var(--line)}
+.screen:nth-of-type(even) .shot{order:2}
+.shot{background:linear-gradient(180deg,var(--stage-a),var(--stage-b));border-radius:24px;padding:clamp(28px,4vw,48px) 20px;display:grid;place-items:center}
+.shot img{width:min(240px,100%);height:auto;filter:drop-shadow(0 20px 36px rgba(0,0,0,.45))}
+.screen-text{display:grid;gap:16px;max-width:52ch}
+.screen-text h3{font-size:clamp(26px,3vw,34px);font-weight:600}
+.screen-text > p{color:var(--muted)}
+.notes{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:12px}
+.notes li{display:grid;grid-template-columns:22px 1fr;gap:10px;font-size:15.5px;line-height:1.5}
+.notes li::before{content:"";width:10px;height:10px;border-radius:50%;margin-top:7px;background:linear-gradient(135deg,var(--accent),var(--teal))}
+.notes b{font-weight:600}
+@media (max-width:760px){.screen{grid-template-columns:1fr}.screen:nth-of-type(even) .shot{order:0}}
+
+/* system */
+.swatches{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-top:40px}
+.sw{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--ground)}
+.sw i{display:block;height:96px}
+.sw div{padding:12px 14px;display:grid;gap:2px}
+.sw b{font-weight:600;font-size:15px}
+.sw code{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.sw small{font-size:13px;color:var(--muted);line-height:1.4}
+.sys-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:14px}
+.panel{border:1px solid var(--line);border-radius:16px;padding:22px;display:grid;gap:14px;align-content:start}
+.panel h3{font-size:20px;font-weight:600}
+.panel p{color:var(--muted);font-size:15.5px}
+.specimen{font-family:var(--body);display:grid;gap:4px}
+.specimen .big{font-size:40px;font-weight:600;letter-spacing:-0.02em;line-height:1}
+.demo{background:linear-gradient(180deg,var(--stage-a),var(--stage-b));border-radius:14px;padding:18px;display:grid;gap:10px;justify-items:center}
+.btn-p{width:100%;max-width:220px;text-align:center;padding:11px 0;border-radius:999px;color:#fff;font-weight:600;font-size:15px;background:linear-gradient(90deg,#576eee,#5ab3c5);box-shadow:0 0 22px rgba(90,179,197,.35)}
+.btn-s{width:100%;max-width:220px;text-align:center;padding:10px 0;border-radius:999px;color:#fff;font-weight:500;font-size:14px;border:1px solid rgba(255,255,255,.55)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.chip{color:#dfe4ff;font-size:12px;padding:6px 10px;border:1px solid rgba(255,255,255,.35);border-radius:10px}
+.chip.on{background:linear-gradient(135deg,#576eee,#5ab3c5);border-color:transparent;color:#fff}
+
+/* reflection */
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:40px;margin-top:40px}
+.two h3{font-size:22px;font-weight:600;margin-bottom:14px}
+.two ul{margin:0;padding-left:18px;display:grid;gap:12px;color:var(--muted)}
+.two li strong{color:var(--ink);font-weight:600}
+
+/* footer nav */
+.next{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-block:48px 64px}
+.next a{text-decoration:none;display:grid;gap:4px}
+.next a b{font-family:var(--display);font-size:clamp(24px,3vw,32px);font-weight:600;letter-spacing:-0.02em}
+.next a:hover b{color:var(--accent)}
+.next a:last-child{text-align:right}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <a href="#">← All work</a>
+    <span class="label">Case study · Mobile app</span>
+  </nav>
+
+  <header class="hero">
+    <span class="label">iOS app · UX / UI design</span>
+    <h1>Focus<span>Up</span></h1>
+    <p class="lead">A study companion that turns “I should really focus” into a session you can start in one tap — and finish feeling proud of.</p>
+    <dl class="meta">
+      <div><dt class="label">Role</dt><dd>Product designer — research, UX flows, UI &amp; visual design</dd></div>
+      <div><dt class="label">Platform</dt><dd>iOS, iPhone 15 Pro frame</dd></div>
+      <div><dt class="label">Tools</dt><dd>Figma</dd></div>
+      <div><dt class="label">Timeline</dt><dd><span class="todo">add dates</span></dd></div>
+      <div><dt class="label">Scope</dt><dd>End-to-end concept, 5 core screens</dd></div>
+    </dl>
+  </header>
+</div>
+
+<div class="wrap">
+  <div class="stage" role="img" aria-label="Five FocusUp screens: onboarding, home, new session setup, active focus timer, and session complete">
+    <div class="stage-scroll">
+      <div class="phones">
+        <figure><img src="img/screen-1.png" alt="Onboarding screen asking what you are focusing on today"><figcaption>Onboard</figcaption></figure>
+        <figure><img src="img/screen-2.png" alt="Home screen with weekly focus total and today's activity"><figcaption>Home</figcaption></figure>
+        <figure><img src="img/screen-3.png" alt="New focus session setup screen"><figcaption>Set up</figcaption></figure>
+        <figure><img src="img/screen-4.png" alt="Active focus timer showing 42:18 of 90 minutes"><figcaption>Focus</figcaption></figure>
+        <figure><img src="img/screen-5.png" alt="Session complete screen celebrating 90 minutes of focus"><figcaption>Complete</figcaption></figure>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <section class="block split" id="overview">
+    <div><span class="label">Overview</span><h2 style="margin-top:12px">The problem with “just focus”</h2></div>
+    <div class="prose">
+      <p><strong>Students don’t lack study time — they lose it.</strong> A two-hour block becomes forty minutes of real work between notifications, tab-switching and deciding what to do next. Most timer apps solve the clock but not the friction: they don’t know what you’re working on, and they give you nothing when you finish.</p>
+      <p>FocusUp treats a study session as a small ritual with a beginning, a middle and a reward. It asks what you’re working on, protects the time while you’re in it, and makes the payoff visible when you’re done — so the next session is easier to start.</p>
+      <p class="hmw"><span class="label">How might we</span>help students start focused work faster, stay in it longer, and actually feel the progress they make?</p>
+    </div>
+  </section>
+
+  <section class="block" id="goals">
+    <span class="label">Design goals</span>
+    <h2 style="margin-top:12px;font-size:clamp(30px,4vw,44px);font-weight:600;max-width:20ch">Three principles shaped every screen</h2>
+    <div class="goals">
+      <div class="goal"><h3>Start in seconds</h3><p>Every extra decision is a chance to procrastinate. The primary action is always the biggest thing on screen, and smart defaults do the rest.</p><span class="where">→ Home, Set up</span></div>
+      <div class="goal"><h3>Protect the zone</h3><p>Once a session starts, the interface steps back: one timer, one motivating line, and only the controls you might need.</p><span class="where">→ Focus</span></div>
+      <div class="goal"><h3>Make progress felt</h3><p>Finishing should feel like a win. Streaks, focus points and a completed task turn an invisible habit into something you can see grow.</p><span class="where">→ Complete, Home</span></div>
+    </div>
+  </section>
+
+  <section class="block" id="flow">
+    <span class="label">User flow</span>
+    <h2 style="margin-top:12px;font-size:clamp(30px,4vw,44px);font-weight:600;max-width:22ch">One loop, designed to repeat</h2>
+    <p style="color:var(--muted);max-width:60ch;margin-top:16px">The core journey is a single loop. The end of one session hands you straight back to the start of the next — either a break or home.</p>
+    <div class="flow-scroll">
+      <div class="flow">
+        <div class="step"><span class="n">01</span><b>Onboard</b><span>Pick what you’re focusing on</span></div>
+        <div class="arrow" aria-hidden="true">→</div>
+        <div class="step"><span class="n">02</span><b>Home</b><span>See the week, tap Start</span></div>
+        <div class="arrow" aria-hidden="true">→</div>
+        <div class="step"><span class="n">03</span><b>Set up</b><span>Task, length, environment</span></div>
+        <div class="arrow" aria-hidden="true">→</div>
+        <div class="step"><span class="n">04</span><b>Focus</b><span>Timer runs, tasks tick off</span></div>
+        <div class="arrow" aria-hidden="true">→</div>
+        <div class="step"><span class="n">05</span><b>Complete</b><span>Stats, streak, reward</span></div>
+      </div>
+      <div class="loop" aria-hidden="true">
+        <svg viewBox="0 0 600 40" preserveAspectRatio="none">
+          <path d="M590 2 V26 H10 V2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 5" vector-effect="non-scaling-stroke" style="color:var(--accent)"/>
+          <path d="M4 10 L10 2 L16 10" fill="none" stroke="currentColor" stroke-width="1.5" vector-effect="non-scaling-stroke" style="color:var(--accent)"/>
+        </svg>
+      </div>
+      <div class="loop" style="margin-top:0"><span class="label" style="width:78%;text-align:center">Back to home / take a break</span></div>
+    </div>
+  </section>
+
+  <section class="block" id="screens" style="padding-bottom:24px">
+    <span class="label">Key screens</span>
+    <h2 style="margin-top:12px;font-size:clamp(30px,4vw,44px);font-weight:600">Screen by screen</h2>
+
+    <article class="screen">
+      <div class="shot"><img src="img/screen-1.png" alt="Onboarding screen"></div>
+      <div class="screen-text">
+        <span class="label">01 · Onboarding</span>
+        <h3>Start with intent, not a sign-up form</h3>
+        <p>The first question the app asks is the one that matters most: what are you focusing on today? Answering it sets up the rest of the experience before the user has typed a single thing.</p>
+        <ul class="notes">
+          <li><span><b>Horizontal carousel picker</b> — Exams, Assignments, Notes and more slide past a centred, highlighted chip. It’s faster than a list and feels playful on first open.</span></li>
+          <li><span><b>Headline as motivation</b> — “It’s time to FocusUp” doubles as brand moment and nudge, with a single glowing CTA.</span></li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="screen">
+      <div class="shot"><img src="img/screen-2.png" alt="Home screen"></div>
+      <div class="screen-text">
+        <span class="label">02 · Home</span>
+        <h3>Your week at a glance, one button to begin</h3>
+        <p>Home answers two questions instantly: how am I doing, and what’s next? A personal greeting and weekly total lead into a single, oversized “Start Focus Session” button.</p>
+        <ul class="notes">
+          <li><span><b>Week strip</b> keeps today anchored in context without a full calendar view.</span></li>
+          <li><span><b>Today’s Activity</b> pairs a time-goal pill with a task list showing estimated minutes, so planning and doing live side by side.</span></li>
+          <li><span><b>Centre play button</b> in the tab bar makes starting a session reachable from anywhere in the app.</span></li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="screen">
+      <div class="shot"><img src="img/screen-3.png" alt="New focus session setup"></div>
+      <div class="screen-text">
+        <span class="label">03 · Session setup</span>
+        <h3>Three choices, then you’re in</h3>
+        <p>Setup is deliberately short: what you’re working on, how long, and how protected you want to be. Everything else is optional.</p>
+        <ul class="notes">
+          <li><span><b>Duration presets</b> (25, 50, 90 min) reflect common study rhythms, with Custom for everyone else.</span></li>
+          <li><span><b>Environment toggles</b> — focus music, silenced notifications, focus mode — turn the phone from distraction into ally.</span></li>
+          <li><span><b>Optional goal field</b> gives the session a finish line without forcing extra input.</span></li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="screen">
+      <div class="shot"><img src="img/screen-4.png" alt="Active focus timer"></div>
+      <div class="screen-text">
+        <span class="label">04 · Focus session</span>
+        <h3>A calm timer that stays out of the way</h3>
+        <p>During a session the interface quiets down. A glowing progress ring and large numerals carry the screen, readable at a glance from across a desk.</p>
+        <ul class="notes">
+          <li><span><b>Progress ring</b> shows elapsed time spatially, so you feel how far you’ve come, not just the minutes left.</span></li>
+          <li><span><b>Motivational line</b> — “Discipline today creates freedom tomorrow” — sits above the timer as a quiet reminder of why.</span></li>
+          <li><span><b>Today’s Tasks</b> stay in reach at the bottom, so checking something off never means leaving the session.</span></li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="screen">
+      <div class="shot"><img src="img/screen-5.png" alt="Session complete"></div>
+      <div class="screen-text">
+        <span class="label">05 · Session complete</span>
+        <h3>Celebrate the finish, set up the next start</h3>
+        <p>The reward screen is where the habit is built. It names the user, names the achievement, and turns one session into visible progress.</p>
+        <ul class="notes">
+          <li><span><b>Four stat tiles</b> — goals completed, focus time, current streak, focus points — give different kinds of motivation to different kinds of students.</span></li>
+          <li><span><b>Completed task card</b> connects the session back to real work.</span></li>
+          <li><span><b>“Take a break” leads</b>, with “Back to home” secondary — encouraging healthy rest instead of burnout.</span></li>
+        </ul>
+      </div>
+    </article>
+  </section>
+
+  <section class="block" id="system">
+    <span class="label">Visual system</span>
+    <h2 style="margin-top:12px;font-size:clamp(30px,4vw,44px);font-weight:600;max-width:22ch">Designed for late-night study</h2>
+    <p style="color:var(--muted);max-width:62ch;margin-top:16px">Students often study in the evening, so FocusUp uses a deep midnight palette that’s easy on the eyes in a dark room. A periwinkle-to-aqua gradient marks every primary action, giving the app a single, recognisable signal for “go.”</p>
+
+    <div class="swatches">
+      <div class="sw"><i style="background:#0c0d1c"></i><div><b>Midnight</b><code>#0C0D1C</code><small>Base background</small></div></div>
+      <div class="sw"><i style="background:#1a1e63"></i><div><b>Deep indigo</b><code>#1A1E63</code><small>Surface gradient</small></div></div>
+      <div class="sw"><i style="background:#576eee"></i><div><b>Periwinkle</b><code>#576EEE</code><small>Primary, gradient start</small></div></div>
+      <div class="sw"><i style="background:#5ab3c5"></i><div><b>Aqua</b><code>#5AB3C5</code><small>Gradient end, progress</small></div></div>
+      <div class="sw"><i style="background:#81bdea"></i><div><b>Sky</b><code>#81BDEA</code><small>Highlight numerals</small></div></div>
+    </div>
+
+    <div class="sys-grid">
+      <div class="panel">
+        <h3>Type</h3>
+        <div class="specimen"><span class="big">42:18</span><span style="font-weight:600;font-size:20px">Great work, Feyza.</span><span style="color:var(--muted);font-size:14px">Rounded geometric sans throughout</span></div>
+        <p>A friendly, rounded sans keeps the tone encouraging rather than clinical. Bold weights carry timers and headlines; small regular text handles supporting detail.</p>
+      </div>
+      <div class="panel">
+        <h3>Components</h3>
+        <div class="demo">
+          <div class="chips"><span class="chip">25min</span><span class="chip">50min</span><span class="chip on">90min</span></div>
+          <div class="btn-p">Start Session</div>
+          <div class="btn-s">Back to home</div>
+        </div>
+        <p>Gradient pill for the one primary action per screen, outlined pill for secondary, and translucent glass cards for grouped content.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="reflection">
+    <span class="label">Reflection</span>
+    <h2 style="margin-top:12px;font-size:clamp(30px,4vw,44px);font-weight:600;max-width:22ch">What I learned, and where it goes next</h2>
+    <div class="two">
+      <div>
+        <h3>Takeaways</h3>
+        <ul>
+          <li><strong>Hierarchy is behaviour design.</strong> Making “Start” the largest element on every screen did more for the goal than any feature.</li>
+          <li><strong>Rewards need restraint.</strong> The complete screen celebrates without gamifying so hard that the work itself gets lost.</li>
+          <li><strong>A consistent signal builds trust.</strong> Reserving the gradient for primary actions made each screen instantly readable.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Next steps</h3>
+        <ul>
+          <li><strong>Usability testing</strong> with students during exam season to validate session lengths and the setup flow.</li>
+          <li><strong>Accessibility pass</strong> on the smallest labels and captions, checking contrast against the dark gradient.</li>
+          <li><strong>Stats &amp; streaks tab</strong> to expand the weekly view into long-term progress and study patterns.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <nav class="next" aria-label="More projects">
+    <a href="#"><span class="label">← Previous</span><b>Project name</b></a>
+    <a href="#"><span class="label">Next →</span><b>Project name</b></a>
+  </nav>
+</div>
