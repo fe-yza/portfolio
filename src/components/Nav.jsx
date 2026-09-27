@@ -11,7 +11,7 @@ const LINKS = [
 
 // Routes with their own dark, self-contained visual system where the
 // transparent nav needs light text regardless of scroll position.
-const FORCE_LIGHT_NAV_ROUTES = ["/work/focusup", "/work/bco"]
+const FORCE_LIGHT_NAV_ROUTES = ["/work/focusup", "/work/bco", "/work/orderguard"]
 
 export default function Nav() {
   const [overHero, setOverHero] = useState(() => window.location.pathname === "/")

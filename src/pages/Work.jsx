@@ -39,13 +39,15 @@ export default function Work() {
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.5, delay: i * 0.06 }}
             whileHover={{ y: -6 }}
-            className="focus-ring group text-left"
+            className={`focus-ring group text-left ${project.wide ? "sm:col-span-2" : ""}`}
           >
             <div className="relative">
               <motion.div layoutId={`image-${project.id}`}>
                 <ProjectThumb
                   project={project}
-                  className="aspect-[4/3] w-full shadow-soft transition-shadow group-hover:shadow-lift"
+                  className={`w-full shadow-soft transition-shadow group-hover:shadow-lift ${
+                    project.wide ? "aspect-[4/3] sm:aspect-[8/3]" : "aspect-[4/3]"
+                  }`}
                 />
               </motion.div>
               {project.category && (

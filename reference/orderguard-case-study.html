@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OrderGuard Case Study</title>
+<meta name="description" content="OrderGuard — predicts delivery failure risk and evaluates cost-justified interventions in a synthetic on-demand delivery marketplace. Designed and built by Feyza Gulbent.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0c0e;
+  --panel:#111317;
+  --panel-2:#15181d;
+  --row:#1a1d23;
+  --border:#25282e;
+  --border-2:#30343b;
+  --text:#e6e8eb;
+  --text-2:#b4b9c1;
+  --muted:#8b9099;
+  --dim:#5d626b;
+  --blue:#6f9cff;
+  --blue-2:#8fb2ff;
+  --blue-ink:#0a1633;
+  --amber:#e3a53a;
+  --green:#6cc47a;
+  --red:#e46a6a;
+  --sans:"Geist", "Inter", system-ui, sans-serif;
+  --mono:"Geist Mono", "JetBrains Mono", ui-monospace, monospace;
+  --gutter:clamp(16px,2.4vw,32px);
+  --max:1400px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit}
+button,input{font:inherit;color:inherit}
+::selection{background:var(--blue);color:var(--blue-ink)}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 var(--gutter)}
+.lbl{font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:8px;min-width:0}
+.p-head{display:flex;align-items:center;gap:10px;justify-content:space-between;padding:16px 18px 12px;flex-wrap:wrap}
+.p-head .l{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.badge{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:4px;border:1px solid;font-weight:500;white-space:nowrap}
+.badge.measured{color:var(--green);border-color:rgba(108,196,122,.55)}
+.badge.estimate{color:var(--amber);border-color:rgba(227,165,58,.6)}
+.badge.synthetic{color:var(--muted);border-color:var(--border-2)}
+.q{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;border:1px solid var(--border-2);font-size:10.5px;color:var(--muted);cursor:help;position:relative;flex:none}
+.q:hover::after,.q:focus::after{content:attr(data-tip);position:absolute;left:50%;top:26px;transform:translateX(-50%);width:260px;background:#1f232a;border:1px solid var(--border-2);color:var(--text-2);font-size:12px;line-height:1.45;text-transform:none;letter-spacing:0;padding:10px 12px;border-radius:6px;z-index:30;font-family:var(--sans);font-weight:400;text-align:left}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:11px 18px;border-radius:6px;font-size:15px;font-weight:500;text-decoration:none;border:1px solid transparent;cursor:pointer;transition:background .2s,border-color .2s,color .2s,transform .2s;white-space:nowrap}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--blue);color:var(--blue-ink)}
+.btn.primary:hover{background:var(--blue-2)}
+.btn.outline{border-color:var(--blue);color:var(--blue-2)}
+.btn.outline:hover{background:rgba(111,156,255,.1)}
+.sec{padding:clamp(56px,7vw,96px) 0 0}
+.sec-h{display:flex;align-items:baseline;gap:14px;margin-bottom:10px}
+.sec-h .n{font-family:var(--mono);font-size:13px;color:var(--blue)}
+.h2{font-size:clamp(28px,3.4vw,44px);font-weight:600;letter-spacing:-.02em;line-height:1.1}
+.sub{color:var(--muted);font-size:clamp(15px,1.2vw,17px);max-width:72ch;margin-top:12px}
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease}
+.reveal.in{opacity:1;transform:none}
+
+/* ---------- INTRO ---------- */
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px 0 18px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.top .brand{display:flex;align-items:center;gap:12px;font-weight:600;font-size:18px}
+.top .brand svg{width:22px;height:22px;color:var(--blue)}
+.top .meta{font-size:13px;color:var(--muted)}
+.banner{margin-top:24px;padding:16px 20px;font-size:15.5px;color:var(--text-2);line-height:1.6}
+.banner b{color:var(--text);font-weight:600}
+.banner .q{vertical-align:-3px;margin:0 6px}
+.banner .dim{color:var(--muted)}
+.hero{display:grid;grid-template-columns:1fr auto;gap:32px;align-items:end;margin-top:44px}
+.hero > *{min-width:0}
+.hero h1{font-size:clamp(38px,5.4vw,76px);font-weight:600;letter-spacing:-.035em;line-height:1.02;max-width:17ch}
+.hero h1 span{color:var(--blue)}
+.hero p{margin-top:18px;color:var(--muted);font-size:clamp(16px,1.3vw,18px);max-width:62ch}
+.tags{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.tag{font-family:var(--mono);font-size:12px;padding:7px 11px;border:1px solid var(--border-2);border-radius:5px;color:var(--text-2);white-space:nowrap}
+.tag.live{display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:var(--green);border-color:rgba(108,196,122,.45)}
+.tag.live i{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 1.8s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(108,196,122,.6)}70%{box-shadow:0 0 0 7px rgba(108,196,122,0)}100%{box-shadow:0 0 0 0 rgba(108,196,122,0)}}
+@media (max-width:900px){.hero{grid-template-columns:1fr}.tags{justify-content:flex-start}}
+.runbar{display:flex;align-items:center;gap:12px;margin-top:36px;flex-wrap:wrap}
+.select{display:flex;align-items:center;gap:12px;padding:11px 14px;border:1px solid var(--border-2);border-radius:6px;background:var(--panel);font-family:var(--mono);font-size:14px;min-width:0;max-width:100%}
+.select span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.select svg{width:14px;height:14px;flex:none;color:var(--muted)}
+.runbar .upd{font-size:13px;color:var(--dim)}
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin-top:18px}
+.kpi{padding:18px 20px 16px;min-height:118px}
+.kpi b{display:block;font-family:var(--mono);font-size:clamp(26px,2.4vw,34px);font-weight:500;margin-top:10px;letter-spacing:-.01em}
+.kpi small{display:block;font-size:13px;color:var(--dim);margin-top:6px}
+@media (max-width:1000px){.kpis{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:560px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.kpi:last-child{grid-column:1/-1}}
+
+/* ---------- CONSOLE ---------- */
+.console{display:grid;grid-template-columns:1.1fr 1fr;gap:18px;margin-top:18px}
+.map-wrap{margin:0 18px 18px;border:1px solid var(--border);border-radius:6px;background:#0d0f12;position:relative;overflow:hidden}
+#map{display:block;width:100%;height:auto}
+.map-legend{position:absolute;left:12px;bottom:10px;display:flex;gap:14px;font-size:11.5px;color:var(--muted);flex-wrap:wrap}
+.map-legend span{display:flex;align-items:center;gap:6px}
+.map-legend i{display:inline-block}
+.seg{display:flex;align-items:center;gap:4px;font-size:13px;color:var(--muted)}
+.seg button{background:none;border:1px solid transparent;border-radius:4px;padding:3px 9px;cursor:pointer;color:var(--text-2);font-family:var(--mono);font-size:13px}
+.seg button.on{background:var(--blue);color:var(--blue-ink)}
+.seg button:not(.on):hover{border-color:var(--border-2)}
+.feed{overflow:auto;max-height:520px;margin:0 6px 10px}
+table{width:100%;border-collapse:collapse}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--panel);white-space:nowrap}
+.panel-2 th,.d-grid th{background:var(--panel-2)}
+td{padding:10px 12px;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:13.5px;white-space:nowrap}
+#feed tr{cursor:pointer;transition:background .15s}
+#feed tr:hover{background:var(--row)}
+#feed tr.sel{background:rgba(111,156,255,.09);box-shadow:inset 2px 0 0 var(--blue)}
+td.id{color:var(--blue)}
+td.risk{color:var(--red)}
+td.risk.mid{color:var(--amber)}
+.empty{padding:30px;text-align:center;color:var(--muted);font-size:14px}
+@media (max-width:1100px){.console{grid-template-columns:1fr}}
+@media (max-width:640px){.map-legend{position:static;padding:8px 10px 10px;border-top:1px solid var(--border)}.map-wrap{margin:0 12px 12px}}
+@media (max-width:560px){.c-conf,.c-stat{display:none}}
+.detail{margin-top:18px}
+.d-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;padding:18px 18px 4px}
+.d-head h3{font-family:var(--mono);font-size:20px;font-weight:500}
+.d-head .st{font-size:14px;color:var(--muted);margin-top:4px}
+.d-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;padding:14px 18px 18px}
+.d-grid .panel{background:var(--panel-2)}
+.stats{display:flex;gap:32px;flex-wrap:wrap;padding:0 18px 14px}
+.stats span{display:block;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.stats b{display:block;font-family:var(--mono);font-size:19px;font-weight:500;margin-top:4px}
+.bar{height:5px;border-radius:3px;background:var(--border);overflow:hidden;min-width:60px}
+.bar span{display:block;height:100%;background:var(--red);border-radius:3px;transition:width .5s ease}
+#riskChart{display:block;width:100%;height:auto}
+#riskChart .g line{stroke:var(--border);stroke-dasharray:3 4}
+#riskChart .ax text{font-family:var(--mono);font-size:10px;fill:var(--muted)}
+.note{font-size:12.5px;color:var(--dim);padding:0 18px 16px}
+.reason{padding:0 18px 12px;font-size:14px;color:var(--text-2)}
+.reason b{color:var(--blue);font-family:var(--mono);font-weight:500}
+tr.chosen td{color:var(--text)}
+tr.chosen td:first-child{color:var(--blue)}
+tr.chosen{background:rgba(111,156,255,.07)}
+.full{grid-column:1/-1}
+.scroll-x{overflow-x:auto}
+.under{display:flex;gap:12px;margin-top:18px;align-items:center;flex-wrap:wrap}
+.under .dim{font-size:13px;color:var(--dim)}
+@media (max-width:900px){.d-grid{grid-template-columns:1fr}}
+
+/* ---------- PIPELINE ---------- */
+.pipe{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:28px}
+.stage{padding:20px;position:relative;min-height:220px;display:flex;flex-direction:column}
+.stage .k{font-family:var(--mono);font-size:12.5px;color:var(--blue)}
+.stage h3{font-size:22px;font-weight:600;letter-spacing:-.01em;margin-top:30px}
+.stage p{font-size:14.5px;color:var(--muted);margin-top:8px}
+.stage code{font-family:var(--mono);font-size:12px;color:var(--text-2);background:var(--row);border:1px solid var(--border);border-radius:4px;padding:3px 7px;align-self:flex-start;margin-top:auto}
+.stage p{margin-bottom:18px}
+.stage:not(:last-child)::after{content:"→";position:absolute;right:-13px;top:22px;color:var(--dim);font-family:var(--mono);z-index:2}
+@media (max-width:1000px){.pipe{grid-template-columns:1fr 1fr}.stage:nth-child(2)::after{display:none}}
+@media (max-width:560px){.pipe{grid-template-columns:1fr}.stage::after{display:none}}
+
+/* ---------- GROUND TRUTH ---------- */
+.gt{display:grid;grid-template-columns:.9fr 1.1fr;gap:18px;margin-top:28px}
+.gt .big{padding:26px}
+.gt .big p{font-size:clamp(20px,1.9vw,26px);line-height:1.35;font-weight:500;letter-spacing:-.01em}
+.gt .big .amber{color:var(--amber)}
+.gt .big small{display:block;margin-top:16px;font-size:14px;color:var(--muted)}
+.wall{display:flex;align-items:center;gap:10px;margin-top:22px;font-family:var(--mono);font-size:12px;color:var(--muted);flex-wrap:wrap}
+.wall span{border:1px solid var(--border-2);border-radius:4px;padding:6px 9px}
+.wall .x{border:0;color:var(--red);font-size:15px;padding:0}
+.wall .arr{border:0;color:var(--green);padding:0}
+.wall .ok{color:var(--green);border-color:rgba(108,196,122,.45)}
+.wall .brk{flex-basis:100%;height:0;border:0;padding:0}
+td .how{color:var(--muted);font-family:var(--sans);font-size:13px}
+@media (max-width:1000px){.gt{grid-template-columns:1fr}}
+
+/* ---------- EV CALC ---------- */
+.ev{display:grid;grid-template-columns:320px minmax(0,1fr);gap:18px;margin-top:28px}
+.form{padding:20px}
+.field{margin-bottom:20px}
+.field label{display:flex;justify-content:space-between;font-size:14px;color:var(--text-2);margin-bottom:8px}
+.field label b{font-family:var(--mono);font-weight:500;color:var(--text)}
+.field input[type=range]{width:100%;accent-color:var(--blue)}
+.presets{display:flex;gap:6px;flex-wrap:wrap}
+.presets button{background:var(--row);border:1px solid var(--border-2);border-radius:5px;padding:6px 10px;font-size:12.5px;cursor:pointer;color:var(--text-2)}
+.presets button:hover{border-color:var(--blue);color:var(--text)}
+.chosen-line{padding:4px 18px 10px;font-size:15px}
+.chosen-line b{font-family:var(--mono);color:var(--blue);font-weight:500}
+.ev-stats{display:flex;gap:30px;flex-wrap:wrap;padding:6px 18px 12px}
+.ev-stats span{display:block;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.ev-stats b{display:block;font-family:var(--mono);font-size:19px;font-weight:500;margin-top:4px}
+.ev-stats b.pos{color:var(--green)}
+@media (max-width:1000px){.ev{grid-template-columns:1fr}}
+
+/* ---------- STRATEGIES ---------- */
+.strats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:28px}
+.strat{padding:22px}
+.strat .k{display:flex;justify-content:space-between;align-items:center}
+.strat h3{font-size:21px;font-weight:600;margin-top:22px}
+.strat p{font-size:14.5px;color:var(--muted);margin-top:8px}
+.strat code{display:block;margin-top:16px;font-family:var(--mono);font-size:12.5px;color:var(--text-2);background:var(--row);border:1px solid var(--border);border-radius:5px;padding:10px 12px;white-space:pre-wrap}
+.strat.win{border-color:rgba(111,156,255,.55);background:linear-gradient(180deg,rgba(111,156,255,.07),transparent 60%),var(--panel)}
+.lab-form{margin-top:14px;padding:20px}
+.lab-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.lab-top h3{font-size:17px;font-weight:600}
+.lab-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:10px}
+.lab-grid span{display:block;font-size:13.5px;color:var(--text-2);margin-bottom:6px}
+.lab-grid b{display:block;background:var(--row);border:1px solid var(--border-2);border-radius:6px;padding:10px 12px;font-family:var(--mono);font-weight:400;font-size:14px}
+.lab-sec{font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:20px}
+@media (max-width:1000px){.strats{grid-template-columns:1fr}.lab-grid{grid-template-columns:1fr 1fr}}
+
+/* ---------- ARCH ---------- */
+.arch{display:grid;grid-template-columns:1.2fr .8fr;gap:18px;margin-top:28px}
+#arch{display:block;width:100%;height:auto}
+#arch .box rect{fill:var(--panel-2);stroke:var(--border-2);transition:stroke .2s,fill .2s}
+#arch .box.on rect{stroke:var(--blue);fill:#151d2e}
+#arch .box{cursor:pointer}
+#arch .box text{font-family:var(--sans);font-size:14px;font-weight:600;fill:var(--text)}
+#arch .box .s{font-family:var(--mono);font-size:10.5px;font-weight:400;fill:var(--muted)}
+#arch .e{stroke:var(--dim);stroke-width:1.4;fill:none}
+#arch .e.f{stroke:var(--blue);stroke-dasharray:5 6;animation:dash 1s linear infinite}
+#arch .el{font-family:var(--mono);font-size:10px;fill:var(--muted)}
+@keyframes dash{to{stroke-dashoffset:-11}}
+.layers button{all:unset;cursor:pointer;display:block;width:100%;box-sizing:border-box;padding:14px 18px;border-top:1px solid var(--border)}
+.layers button:first-child{border-top:0}
+.layers b{font-size:16px;font-weight:600;display:flex;justify-content:space-between}
+.layers b i{font-style:normal;font-family:var(--mono);font-size:12px;color:var(--dim);font-weight:400}
+.layers small{display:block;font-size:14px;color:var(--muted);max-height:0;overflow:hidden;transition:max-height .35s,margin .35s}
+.layers button.on{background:var(--panel-2);box-shadow:inset 2px 0 0 var(--blue)}
+.layers button.on small{max-height:120px;margin-top:6px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;padding:16px 18px 18px;border-top:1px solid var(--border)}
+.chips span{font-family:var(--mono);font-size:12px;border:1px solid var(--border-2);border-radius:4px;padding:5px 9px;color:var(--text-2)}
+@media (max-width:1000px){.arch{grid-template-columns:1fr}}
+
+/* ---------- SCOPE / ROLE ---------- */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:28px}
+.list{list-style:none}
+.list li{display:grid;grid-template-columns:26px 1fr;gap:10px;padding:14px 18px;border-top:1px solid var(--border);font-size:15px;color:var(--text-2)}
+.list li:first-child{border-top:0}
+.list li b{color:var(--text);font-weight:600;display:block}
+.list li i{font-style:normal;font-family:var(--mono);font-size:13px;padding-top:1px}
+.list.in i{color:var(--green)}
+.list.out i{color:var(--dim)}
+.role{padding:24px}
+.role p{font-size:16px;color:var(--text-2);line-height:1.6}
+.role .who{display:flex;align-items:center;gap:14px;margin-top:22px}
+.role .av{width:46px;height:46px;border-radius:50%;background:var(--blue);color:var(--blue-ink);display:grid;place-items:center;font-weight:700;font-size:18px}
+.role .who b{display:block;font-weight:600}
+.role .who span{font-size:13px;color:var(--muted)}
+.dec td{font-family:var(--sans);white-space:normal;font-size:14.5px;color:var(--text-2)}
+.dec td:first-child{font-family:var(--mono);color:var(--text);font-size:13.5px;white-space:nowrap;vertical-align:top}
+@media (max-width:900px){.two{grid-template-columns:1fr}}
+@media (max-width:560px){.dec td:first-child{white-space:normal;word-break:break-word}}
+
+/* ---------- CTA ---------- */
+.cta{margin-top:clamp(56px,7vw,96px);padding:clamp(28px,5vw,56px);display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center;background:linear-gradient(120deg,rgba(111,156,255,.1),transparent 55%),var(--panel)}
+.cta h2{font-size:clamp(28px,3.4vw,44px);font-weight:600;letter-spacing:-.02em;line-height:1.1}
+.cta p{color:var(--muted);margin-top:10px;max-width:60ch}
+.cta .btns{display:flex;gap:12px;flex-wrap:wrap}
+@media (max-width:800px){.cta{grid-template-columns:1fr}}
+footer{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:28px 0 40px;margin-top:40px;border-top:1px solid var(--border);font-size:13px;color:var(--dim)}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <div class="brand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 2.5l8 3v6c0 5.2-3.4 8.8-8 10.3C7.4 20.3 4 16.7 4 11.5v-6z"/><path d="M8.5 13.5l2.5 2.5 4.5-5"/></svg>OrderGuard</div>
+    <div class="meta">Case study · synthetic marketplace — no real company data</div>
+  </div>
+
+  <div class="panel banner">
+    <b>OrderGuard</b> predicts delivery failure risk and evaluates cost-justified interventions in a synthetic on-demand delivery marketplace simulation.<span class="q" tabindex="0" data-tip="Merchants, drivers, customers and orders are all generated by a seeded simulation run.">?</span><span class="dim">All data is generated by a seeded simulation — no real company, courier, or customer data is used anywhere.</span>
+  </div>
+
+  <header class="hero">
+    <div>
+      <h1>Spot failing deliveries early — and <span>only intervene when it pays.</span></h1>
+      <p>A delivery operations dashboard that identifies orders at risk of failure, explains the likely causes, and evaluates whether an intervention is worth its cost.</p>
+    </div>
+    <div class="tags">
+      <a class="tag live" href="https://orderguard-silk.vercel.app/" target="_blank" rel="noopener"><i></i>live on vercel</a>
+      <span class="tag">full-stack</span><span class="tag">simulation</span><span class="tag">design + build</span>
+    </div>
+  </header>
+
+  <div class="runbar">
+    <div class="select"><span>run-fcb1aa39 · seed 21 · 480 sim min</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6l4 4 4-4"/></svg></div>
+    <span class="q" tabindex="0" data-tip="The KPIs come from a real OrderGuard run (seed 21). The console below them is an interactive replica built for this case study.">?</span>
+    <span class="upd" id="upd">replica console · updated just now</span>
+  </div>
+
+  <div class="kpis">
+    <div class="panel kpi"><span class="lbl">Active deliveries</span><b>49</b></div>
+    <div class="panel kpi"><span class="lbl">High-risk orders</span><b style="color:var(--amber)">22</b><small>score ≥ 50</small></div>
+    <div class="panel kpi"><span class="lbl">Failure rate</span><b style="color:var(--green)">0.6%</b></div>
+    <div class="panel kpi"><span class="lbl">Interventions triggered</span><b>626</b><small>$119.45 spent</small></div>
+    <div class="panel kpi"><span class="lbl">Avg. cost / intervention</span><b>$0.19</b><small>cheap actions first</small></div>
+  </div>
+
+  <div class="console">
+    <div class="panel">
+      <div class="p-head"><span class="l"><span class="lbl">Marketplace map</span></span><span style="font-size:12.5px;color:var(--dim)">synthetic coordinate plane — not a real map</span></div>
+      <div class="map-wrap">
+        <svg id="map" viewBox="0 0 640 460" aria-label="Synthetic marketplace map with merchants, drivers and delivery routes"></svg>
+        <div class="map-legend">
+          <span><i style="width:9px;height:9px;background:var(--amber)"></i>merchant</span>
+          <span><i style="width:9px;height:9px;border-radius:50%;background:var(--blue)"></i>driver</span>
+          <span><i style="width:16px;height:2px;background:var(--red)"></i>high-risk route</span>
+          <span><i style="width:16px;height:1px;background:#3a5a44"></i>route</span>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="p-head">
+        <span class="l"><span class="lbl">High-risk order feed</span><span class="q" tabindex="0" data-tip="Orders whose current risk score is at or above the selected threshold, highest first. Click one to open its detail.">?</span></span>
+        <span class="seg" id="thr">risk ≥ <button data-t="25">25</button><button data-t="50" class="on">50</button><button data-t="75">75</button></span>
+      </div>
+      <div class="feed">
+        <table>
+          <thead><tr><th>Order</th><th class="c-stat">Status</th><th>Risk</th><th>Predicted</th><th class="c-conf">Conf.</th></tr></thead>
+          <tbody id="feed"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel detail" id="detail"></div>
+
+  <div class="under">
+    <a class="btn primary" href="https://orderguard-silk.vercel.app/" target="_blank" rel="noopener">Visit OrderGuard →</a>
+    <a class="btn outline" href="https://orderguard-silk.vercel.app/" target="_blank" rel="noopener">Take the guided tour</a>
+    <span class="dim">Replica console for this case study · the live app runs the full backend simulation</span>
+  </div>
+
+  <section class="sec reveal">
+    <div class="sec-h"><span class="n">01</span><h2 class="h2">How it works</h2></div>
+    <p class="sub">Can we spot delivery problems early enough to prevent them — and choose a response that costs less than the expected failure? OrderGuard answers it in four steps.</p>
+    <div class="pipe">
+      <div class="panel stage"><span class="k">simulate</span><h3>Run a marketplace</h3><p>Merchants, drivers, customers and orders, each order tracked through preparation, driver assignment, travel and its final outcome.</p><code>seed · duration · supply · demand</code></div>
+      <div class="panel stage"><span class="k">score</span><h3>Detect risk</h3><p>Every event re-scores the order 0–100 from observable factors like merchant backlog, driver reliability, customer reachability and projected lateness.</p><code>event-reactive, not polled</code></div>
+      <div class="panel stage"><span class="k">decide</span><h3>Price the response</h3><p>Each intervention is compared against doing nothing on expected cost: direct cost plus the residual cost of failure.</p><code>min(direct + residual)</code></div>
+      <div class="panel stage"><span class="k">measure</span><h3>Compare strategies</h3><p>The same seeded scenario runs three ways, so outcomes and intervention spend can be compared like-for-like.</p><code>none · threshold · expected-value</code></div>
+    </div>
+  </section>
+
+  <section class="sec reveal">
+    <div class="sec-h"><span class="n">02</span><h2 class="h2">Ground truth vs. what the engine can see</h2></div>
+    <p class="sub">The simulator decides what actually goes wrong. The risk engine has to infer it — the same way a real operations system would.</p>
+    <div class="gt">
+      <div class="panel big">
+        <p>Failure hazard rates are the simulator's hidden ground truth. <span class="amber">The risk engine never receives these values directly</span> — it must infer risk from observable marketplace state.</p>
+        <small>That separation keeps the evaluation honest: the model can't score well by peeking at the answer.</small>
+        <div class="wall"><span>hazard rates</span><span class="x">✕</span><span>risk engine</span><span class="brk"></span><span class="ok">observable state</span><span class="arr">→</span><span>risk engine</span></div>
+      </div>
+      <div class="panel">
+        <div class="p-head"><span class="l"><span class="lbl">Failure hazard rates</span><span class="badge synthetic">ground truth</span></span></div>
+        <div class="scroll-x">
+          <table>
+            <thead><tr><th>Hazard</th><th>Default</th><th>When it's checked</th></tr></thead>
+            <tbody>
+              <tr><td>driver_goes_offline</td><td>0.0008</td><td><span class="how">every tick, while delivering</span></td></tr>
+              <tr><td>merchant_stockout</td><td>0.03</td><td><span class="how">once, at order confirmation</span></td></tr>
+              <tr><td>customer_unreachable</td><td>0.02</td><td><span class="how">once, at arrival</span></td></tr>
+              <tr><td>perishable_spoilage</td><td>0.05</td><td><span class="how">every tick, once already late</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec reveal" id="ev">
+    <div class="sec-h"><span class="n">03</span><h2 class="h2">Expected-value reasoning</h2></div>
+    <p class="sub">OrderGuard's engine doesn't act just because risk is high. It picks the option with the lowest total expected cost — and "do nothing" is always on the table. Drag the inputs to see the choice change.</p>
+    <div class="ev">
+      <div class="panel form">
+        <div class="field"><label for="evRisk">Risk score <b id="evRiskV">72</b></label><input type="range" id="evRisk" min="0" max="100" value="72"></div>
+        <div class="field"><label for="evFail">Failure cost <b id="evFailV">$10.00</b></label><input type="range" id="evFail" min="2" max="60" value="10"></div>
+        <div class="field"><label>Scenario presets</label>
+          <div class="presets"><button data-r="4" data-f="10">Healthy order</button><button data-r="55" data-f="10">Borderline</button><button data-r="86" data-f="10">Likely late</button><button data-r="86" data-f="45">High-value, likely late</button></div>
+        </div>
+        <p style="font-size:12.5px;color:var(--dim)">Intervention costs and effects in this calculator are illustrative modelling assumptions.</p>
+      </div>
+      <div class="panel">
+        <div class="p-head"><span class="l"><span class="lbl">Recommended intervention — expected-value reasoning</span><span class="badge estimate">model estimate</span></span></div>
+        <div class="chosen-line" id="evChosen"></div>
+        <div class="ev-stats" id="evStats"></div>
+        <div class="scroll-x" style="padding:0 6px 8px">
+          <table>
+            <thead><tr><th>Intervention</th><th>Direct cost</th><th>Implied P(fail)</th><th>Est. prob. reduction</th><th>Residual cost</th><th>Total expected</th></tr></thead>
+            <tbody id="evTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec reveal">
+    <div class="sec-h"><span class="n">04</span><h2 class="h2">One seed, three strategies</h2></div>
+    <p class="sub">The Simulation Lab runs the same seeded marketplace three ways and reports real, measured outcomes from an actual simulation run. Nothing is precomputed.</p>
+    <div class="strats">
+      <div class="panel strat"><div class="k"><span class="lbl">Baseline</span><span class="badge synthetic">control</span></div><h3>No intervention</h3><p>Every order plays out untouched. The floor everything else is measured against.</p><code>action = do_nothing</code></div>
+      <div class="panel strat"><div class="k"><span class="lbl">Naive</span><span class="badge synthetic">baseline</span></div><h3>Threshold-based</h3><p>If an order's risk score crosses a fixed trigger, act. Simple — but it spends the same way on every flagged order.</p><code>if score ≥ 50: intervene</code></div>
+      <div class="panel strat win"><div class="k"><span class="lbl" style="color:var(--blue)">OrderGuard</span><span class="badge measured">engine</span></div><h3>Expected-value engine</h3><p>No fixed threshold. For each order, choose the action with the lowest direct cost plus residual expected failure cost.</p><code>argmin(direct + P(fail|a) × cost)</code></div>
+    </div>
+    <div class="panel lab-form">
+      <div class="lab-top"><h3>Configure &amp; run experiment</h3><a class="btn primary" href="https://orderguard-silk.vercel.app/" target="_blank" rel="noopener">Open Simulation Lab →</a></div>
+      <p style="font-size:14.5px;color:var(--muted);margin-top:6px">Every field maps directly to a parameter the backend simulation engine accepts.</p>
+      <div class="lab-sec">Marketplace scale</div>
+      <div class="lab-grid"><div><span>Random seed</span><b>42</b></div><div><span>Duration (sim. minutes)</span><b>480</b></div><div><span>Merchants</span><b>20</b></div><div><span>Drivers (supply)</span><b>35</b></div><div><span>Customers</span><b>300</b></div><div><span>Map size (km)</span><b>10</b></div><div><span>Order arrival rate (/min)</span><b>1</b></div><div><span>Avg prep time (min)</span><b>12 ± 3</b></div></div>
+      <div class="lab-sec">Baseline policy</div>
+      <div class="lab-grid"><div><span>Threshold-based trigger score</span><b>50</b></div></div>
+    </div>
+  </section>
+
+  <section class="sec reveal">
+    <div class="sec-h"><span class="n">05</span><h2 class="h2">Architecture</h2></div>
+    <p class="sub">Simulation, explainable risk scoring, backend services, persistent data and an interactive dashboard, working together.</p>
+    <div class="arch">
+      <div class="panel" style="padding:18px">
+        <svg id="arch" viewBox="0 0 620 360" aria-label="Architecture diagram">
+          <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#5d626b"/></marker></defs>
+          <path class="e f" d="M170 70 H 250" marker-end="url(#ah)"/><text class="el" x="210" y="60" text-anchor="middle">events</text>
+          <path class="e" d="M400 110 V 150" marker-end="url(#ah)"/><text class="el" x="410" y="136">persist</text>
+          <path class="e" d="M400 230 V 250" marker-end="url(#ah)"/>
+          <path class="e f" d="M250 290 H 170" marker-end="url(#ah)"/><text class="el" x="210" y="280" text-anchor="middle">JSON API</text>
+          <g class="box on" data-k="sim"><rect x="10" y="30" width="160" height="80" rx="7"/><text x="90" y="64" text-anchor="middle">Simulation engine</text><text class="s" x="90" y="84" text-anchor="middle">python · seeded</text></g>
+          <g class="box" data-k="api"><rect x="250" y="30" width="300" height="80" rx="7"/><text x="400" y="64" text-anchor="middle">Risk + intervention service</text><text class="s" x="400" y="84" text-anchor="middle">rules · expected value</text></g>
+          <g class="box" data-k="db"><rect x="250" y="150" width="300" height="80" rx="7"/><text x="400" y="184" text-anchor="middle">PostgreSQL</text><text class="s" x="400" y="204" text-anchor="middle">sqlalchemy · alembic migrations</text></g>
+          <g class="box" data-k="api2"><rect x="250" y="250" width="300" height="80" rx="7"/><text x="400" y="284" text-anchor="middle">FastAPI</text><text class="s" x="400" y="304" text-anchor="middle">runs · orders · experiments</text></g>
+          <g class="box" data-k="ui"><rect x="10" y="250" width="160" height="80" rx="7"/><text x="90" y="284" text-anchor="middle">Dashboard</text><text class="s" x="90" y="304" text-anchor="middle">next.js · react · ts</text></g>
+        </svg>
+      </div>
+      <div class="panel layers" id="layers">
+        <button class="on" data-k="sim"><b>Simulation engine <i>01</i></b><small>Seeded marketplace: merchants, drivers, customers and orders moving through their lifecycle, with hidden hazard rates generating outcomes.</small></button>
+        <button data-k="api"><b>Risk + intervention service <i>02</i></b><small>Re-scores an order on every event from observable state, and prices each intervention against doing nothing.</small></button>
+        <button data-k="db"><b>PostgreSQL <i>03</i></b><small>Runs, orders, event timelines, risk assessments and experiment results — managed with SQLAlchemy and Alembic.</small></button>
+        <button data-k="api2"><b>FastAPI <i>04</i></b><small>Endpoints serving runs, order detail and Simulation Lab experiments to the frontend.</small></button>
+        <button data-k="ui"><b>Dashboard <i>05</i></b><small>Next.js, React and TypeScript: Overview, Simulation Lab and a guided tour.</small></button>
+        <div class="chips"><span>Python 3.12</span><span>FastAPI</span><span>SQLAlchemy</span><span>Alembic</span><span>PostgreSQL</span><span>Next.js</span><span>React</span><span>TypeScript</span><span>Vercel</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec reveal">
+    <div class="sec-h"><span class="n">06</span><h2 class="h2">Scope &amp; limitations</h2></div>
+    <p class="sub">A working simulation and decision-support prototype — scoped deliberately, and labelled honestly throughout the product.</p>
+    <div class="two">
+      <div class="panel">
+        <div class="p-head"><span class="lbl">By design</span></div>
+        <ul class="list in">
+          <li><i>✓</i><span><b>Fully synthetic</b>All merchants, drivers, customers and orders are generated. No real platform, drivers or customers are contacted.</span></li>
+          <li><i>✓</i><span><b>Explicit rules, not ML</b>Risk scoring uses transparent rules, so every score can be broken down factor by factor.</span></li>
+          <li><i>✓</i><span><b>Measured vs. estimated</b>Timelines are badged <span class="badge measured" style="font-size:9.5px">measured</span>; scores and recommendations are badged <span class="badge estimate" style="font-size:9.5px">model estimate</span>.</span></li>
+          <li><i>✓</i><span><b>Assumptions are assumptions</b>Intervention costs and effects are modelling inputs, and one simulation doesn't establish real-world effectiveness.</span></li>
+        </ul>
+      </div>
+      <div class="panel">
+        <div class="p-head"><span class="lbl">Out of scope</span></div>
+        <ul class="list out">
+          <li><i>—</i><span><b>Authentication</b>A public demo, open to anyone exploring it.</span></li>
+          <li><i>—</i><span><b>Live marketplace integrations</b>No connection to a real delivery platform or dispatch system.</span></li>
+          <li><i>—</i><span><b>Large-scale distributed processing</b>Built to run a city-sized simulation clearly, not millions of orders.</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec reveal">
+    <div class="sec-h"><span class="n">07</span><h2 class="h2">My role</h2></div>
+    <div class="two">
+      <div class="panel role">
+        <p>I designed and built OrderGuard end to end — the marketplace simulation, the risk and expected-value engine, the FastAPI backend and PostgreSQL schema, and the Next.js dashboard on top. It's my exploration of how operations teams can make fast, defensible decisions under uncertainty.</p>
+        <div class="who"><div class="av">F</div><div><b>Feyza Gulbent</b><span>Designer &amp; developer</span></div></div>
+      </div>
+      <div class="panel">
+        <div class="p-head"><span class="lbl">Key decisions</span></div>
+        <div class="scroll-x">
+          <table class="dec"><tbody>
+            <tr><td>explainable_scores</td><td>Rules over a black box, so an operator can see why an order is flagged before acting.</td></tr>
+            <tr><td>do_nothing_is_valid</td><td>Every intervention is priced against doing nothing — the engine can say "not worth it."</td></tr>
+            <tr><td>hidden_ground_truth</td><td>The risk engine never sees hazard rates, so evaluation can't cheat.</td></tr>
+            <tr><td>seeded_runs</td><td>Same seed, same world — every strategy faces identical orders.</td></tr>
+            <tr><td>honest_labels</td><td>Measured data and model estimates are badged separately across the UI.</td></tr>
+          </tbody></table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="panel cta reveal">
+    <div><h2>Run your own scenario.</h2><p>Open the Simulation Lab, configure a marketplace, and see when interventions improve outcomes — and when they just add cost.</p></div>
+    <div class="btns"><a class="btn primary" href="https://orderguard-silk.vercel.app/" target="_blank" rel="noopener">Visit OrderGuard →</a><a class="btn outline" href="https://orderguard-silk.vercel.app/" target="_blank" rel="noopener">Take the guided tour</a></div>
+  </div>
+
+  <footer><span>OrderGuard · synthetic marketplace — no real company data</span><span>Case study · Feyza Gulbent</span></footer>
+</div>
+
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = s => document.querySelector(s);
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), {threshold:.08});
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  const rng = seed => () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  const R = rng(21);
+  const fmt = v => '$' + v.toFixed(2);
+
+  /* interventions (illustrative assumptions) */
+  const ACTS = [
+    {k:'do_nothing', cost:0, red:0},
+    {k:'update_eta', cost:0.05, red:.18},
+    {k:'notify_merchant', cost:0.25, red:.30},
+    {k:'offer_credit', cost:2.00, red:.35},
+    {k:'reassign_driver', cost:1.50, red:.55}
+  ];
+  const pFromScore = s => Math.min(.95, Math.pow(s / 100, 1.35) * .9);
+  const evaluate = (score, C) => {
+    const p = pFromScore(score);
+    return ACTS.map(a => { const pr = p * (1 - a.red), residual = pr * C; return {...a, p:pr, residual, total:a.cost + residual}; });
+  };
+
+  /* synthetic marketplace */
+  const merchants = Array.from({length:10}, (_, i) => ({id:'merchant-' + String(i + 1).padStart(3, '0'), x:90 + R() * 460, y:50 + R() * 330}));
+  const custs = Array.from({length:46}, () => ({x:40 + R() * 560, y:30 + R() * 380}));
+  const STATUSES = ['confirmed', 'en_route_to_merchant', 'at_merchant', 'en_route_to_customer'];
+  const PRED = ['late_delivery', 'late_delivery', 'late_delivery', 'customer_unreachable', 'merchant_stockout', 'driver_offline'];
+  const FACT = [
+    {k:'merchant_backlog', w:.30, sig:o => `${o.f.backlog} open orders`},
+    {k:'driver_reliability', w:.25, sig:o => `${Math.round(o.f.driver * 100)}% on-time`},
+    {k:'customer_reachability', w:.15, sig:o => o.f.reach > .8 ? 'verified contact' : o.f.reach > .5 ? '1 missed contact' : '2 missed contacts'},
+    {k:'projected_lateness', w:.30, sig:o => `${o.f.late >= 0 ? '+' : ''}${o.f.late.toFixed(1)} min vs ETA`}
+  ];
+  const signals = o => [Math.min(1, o.f.backlog / 8), Math.max(0, 1 - (o.f.driver - .55) / .45), 1 - o.f.reach, Math.max(0, Math.min(1, (o.f.late + 5) / 25))];
+  const scoreOf = o => { const s = signals(o); return FACT.reduce((t, f, i) => t + f.w * s[i] * 100, 0); };
+
+  const orders = Array.from({length:34}, (_, i) => {
+    const m = merchants[Math.floor(R() * merchants.length)], c = custs[Math.floor(R() * custs.length)];
+    const hot = R() < .45;
+    return {
+      id:'order-' + String(440 + i * 7 + Math.floor(R() * 6)).padStart(6, '0'),
+      m, c, status:Math.floor(R() * 4), t:R(),
+      pred:PRED[Math.floor(R() * PRED.length)],
+      f:{backlog:hot ? 4 + Math.floor(R() * 5) : Math.floor(R() * 4), driver:hot ? .58 + R() * .25 : .82 + R() * .17, reach:hot ? .3 + R() * .5 : .7 + R() * .3, late:hot ? 4 + R() * 16 : -8 + R() * 10},
+      created:9 * 60 + 5 + Math.floor(R() * 40)
+    };
+  });
+  orders.forEach(o => { o.score = scoreOf(o); o.conf = o.score > 70 ? 66 + Math.round(R() * 14) : 55 + Math.round(R() * 20); if (o.score < 35) o.pred = 'none'; });
+
+  let thr = 50, sel = null;
+  const svg = $('#map'), NS = 'http://www.w3.org/2000/svg';
+  const el = (n, a) => { const e = document.createElementNS(NS, n); for (const k in a) e.setAttribute(k, a[k]); return e; };
+  const gNet = el('g', {}), gRoutes = el('g', {}), gMer = el('g', {}), gDrv = el('g', {});
+  svg.append(gNet, gRoutes, gMer, gDrv);
+  custs.forEach((c, i) => { if (i % 2 === 0) { const m = merchants[i % merchants.length]; gNet.append(el('line', {x1:c.x, y1:c.y, x2:m.x, y2:m.y, stroke:'#1f3326', 'stroke-width':1})); } });
+  custs.forEach(c => gNet.append(el('circle', {cx:c.x, cy:c.y, r:2.2, fill:'#3a3f47'})));
+  merchants.forEach(m => gMer.append(el('rect', {x:m.x - 6, y:m.y - 6, width:12, height:12, fill:'#e3a53a', rx:1})));
+
+  const drawMap = () => {
+    gRoutes.innerHTML = ''; gDrv.innerHTML = '';
+    orders.forEach(o => {
+      const hi = o.score >= thr, isSel = o.id === sel;
+      const line = el('line', {x1:o.m.x, y1:o.m.y, x2:o.c.x, y2:o.c.y, stroke:hi ? '#e46a6a' : '#2b4a34', 'stroke-width':isSel ? 4.5 : hi ? 2.6 : 1.1, 'stroke-linecap':'round', opacity:!isSel && hi ? .6 : 1});
+      line.style.cursor = 'pointer'; line.addEventListener('click', () => select(o.id));
+      gRoutes.append(line);
+      const t = o.status < 2 ? o.t * .4 : .4 + o.t * .6;
+      const d = el('circle', {cx:o.m.x + (o.c.x - o.m.x) * t, cy:o.m.y + (o.c.y - o.m.y) * t, r:isSel ? 8 : 5.5, fill:'#6f9cff', stroke:isSel ? '#fff' : '#0d0f12', 'stroke-width':isSel ? 2 : 1.5});
+      d.style.cursor = 'pointer'; d.addEventListener('click', () => select(o.id));
+      const tt = el('title', {}); tt.textContent = `${o.id} · risk ${o.score.toFixed(1)}`; d.append(tt);
+      gDrv.append(d);
+    });
+  };
+
+  const drawFeed = () => {
+    const list = orders.filter(o => o.score >= thr).sort((a, b) => b.score - a.score);
+    $('#feed').innerHTML = list.length ? list.map(o => `<tr data-id="${o.id}" class="${o.id === sel ? 'sel' : ''}"><td class="id">${o.id}</td><td class="c-stat">${STATUSES[o.status]}</td><td class="risk${o.score < 60 ? ' mid' : ''}">${o.score.toFixed(1)}</td><td>${o.pred}</td><td class="c-conf">${o.conf}%</td></tr>`).join('')
+      : `<tr><td colspan="5" class="empty">No orders at or above ${thr}</td></tr>`;
+    $('#feed').querySelectorAll('tr[data-id]').forEach(tr => tr.addEventListener('click', () => select(tr.dataset.id)));
+  };
+
+  const hhmm = m => { const h = Math.floor(m / 60), mm = m % 60; return `${((h + 11) % 12) + 1}:${String(mm).padStart(2, '0')}:00 ${h >= 12 ? 'PM' : 'AM'}`; };
+
+  const drawDetail = () => {
+    const o = orders.find(x => x.id === sel); if (!o) return;
+    const r = rng(parseInt(o.id.slice(-6), 10) + 7);
+    const steps = [['order_created', 0], ['order_confirmed', 0], ['driver_assigned', 1], ['driver_en_route_to_merchant', 1], ['driver_arrived_at_merchant', 2], ['order_picked_up', 3], ['driver_en_route_to_customer', 3]];
+    let tm = o.created; const tl = [];
+    const gap = [0, 0, 1, 0, 4, 5, 0]; steps.forEach(([ev, need], i) => { if (o.status >= need) { tm += gap[i] + (gap[i] ? Math.floor(r() * 5) : 0); tl.push([ev, tm, ev === 'driver_assigned' ? `{"driver_id":"driver-00${10 + Math.floor(r() * 25)}"}` : '—']); } });
+    const pts = tl.map((_, i) => Math.max(0, Math.min(100, o.score * (0.3 + 0.7 * (i / Math.max(1, tl.length - 1))) + (r() - .5) * 6)));
+    pts[pts.length - 1] = o.score;
+    const cw = 560, ch = 190, L = 34, B = 26, T = 12, Rr = 14;
+    const xs = i => L + i * (cw - L - Rr) / Math.max(1, pts.length - 1), ys = v => T + (1 - v / 100) * (ch - T - B);
+    const path = pts.map((v, i) => (i ? 'L' : 'M') + xs(i).toFixed(1) + ' ' + ys(v).toFixed(1)).join(' ');
+    const shortT = m => hhmm(m).replace(':00 ', ' ');
+    const chart = `<svg id="riskChart" viewBox="0 0 ${cw} ${ch}" role="img" aria-label="Risk score over time for ${o.id}"><g class="g">${[0, 25, 50, 75, 100].map(v => `<line x1="${L}" x2="${cw - Rr}" y1="${ys(v)}" y2="${ys(v)}"/>`).join('')}</g>
+      <g class="ax">${[0, 25, 50, 75, 100].map(v => `<text x="${L - 6}" y="${ys(v) + 3}" text-anchor="end">${v}</text>`).join('')}${pts.map((_, i) => (i === 0 || i === pts.length - 1 || (pts.length > 4 && i === Math.floor(pts.length / 2))) ? `<text x="${xs(i)}" y="${ch - 8}" text-anchor="${i === 0 ? 'start' : i === pts.length - 1 ? 'end' : 'middle'}">${shortT(tl[i][1])}</text>` : '').join('')}</g>
+      <line x1="${L}" x2="${cw - Rr}" y1="${ys(thr)}" y2="${ys(thr)}" stroke="#e3a53a" stroke-width="1" stroke-dasharray="5 4" opacity=".7"/><text x="${L + 6}" y="${ys(thr) - 5}" font-family="Geist Mono, monospace" font-size="10" fill="#e3a53a">threshold ${thr}</text>
+      <path d="${path}" fill="none" stroke="#e46a6a" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+      ${pts.map((v, i) => `<circle cx="${xs(i)}" cy="${ys(v)}" r="4" fill="#e46a6a" stroke="#15181d" stroke-width="1.5"><title>${tl[i][0]} · ${v.toFixed(1)}</title></circle>`).join('')}</svg>`;
+    const s = signals(o);
+    const contrib = FACT.map((f, i) => ({...f, v:f.w * s[i] * 100})).sort((a, b) => b.v - a.v);
+    const C = 10, ev = evaluate(o.score, C), best = ev.reduce((a, b) => b.total < a.total ? b : a), base = ev[0];
+    $('#detail').innerHTML = `
+      <div class="d-head"><div><h3>${o.id}</h3><div class="st">${STATUSES[o.status]} · from ${o.m.id}</div></div><span class="badge synthetic">click any order or route to inspect</span></div>
+      <div class="d-grid">
+        <div class="panel">
+          <div class="p-head"><span class="l"><span class="lbl">Timeline</span><span class="badge measured">measured</span></span></div>
+          <div class="scroll-x" style="padding:0 6px 8px"><table><thead><tr><th>Event</th><th>Time</th><th>Details</th></tr></thead><tbody>${tl.map(t => `<tr><td>${t[0]}</td><td>${hhmm(t[1])}</td><td style="color:var(--muted)">${t[2]}</td></tr>`).join('')}</tbody></table></div>
+        </div>
+        <div class="panel">
+          <div class="p-head"><span class="l"><span class="lbl">Risk score over time</span><span class="badge estimate">model estimate</span></span></div>
+          <div style="padding:0 14px 6px">${chart}</div>
+          <p class="note">Recomputed each time an event fired for this order (event-reactive, not polled).</p>
+        </div>
+        <div class="panel full">
+          <div class="p-head"><span class="l"><span class="lbl">Latest risk assessment</span><span class="badge estimate">model estimate</span></span></div>
+          <div class="stats"><div><span>Score</span><b style="color:${o.score >= thr ? 'var(--red)' : 'var(--text)'}">${o.score.toFixed(1)}</b></div><div><span>Predicted</span><b>${o.pred}</b></div><div><span>Confidence</span><b>${o.conf}%</b></div><div><span>Predicted delay</span><b>${o.f.late.toFixed(1)} min</b></div></div>
+          <div class="scroll-x" style="padding:0 6px 8px"><table><thead><tr><th>Factor</th><th>Weight</th><th>Signal</th><th>Contribution</th><th style="width:28%"></th></tr></thead><tbody>${contrib.map(f => `<tr><td>${f.k}</td><td>${f.w.toFixed(2)}</td><td style="color:var(--text-2)">${f.sig(o)}</td><td>${f.v.toFixed(1)}</td><td><div class="bar"><span style="width:${Math.min(100, f.v / 30 * 100).toFixed(0)}%"></span></div></td></tr>`).join('')}</tbody></table></div>
+        </div>
+        <div class="panel full">
+          <div class="p-head"><span class="l"><span class="lbl">Recommended intervention — expected-value reasoning</span><span class="badge estimate">model estimate</span></span></div>
+          <p class="reason">Chosen: <b>${best.k}</b> — ${best.k === 'do_nothing' ? `no intervention costs less than the risk it removes.` : `${fmt(best.cost)} direct plus ${fmt(best.residual)} residual expected failure cost (${fmt(best.total)} total), saving ${fmt(base.total - best.total)} vs. doing nothing.`}</p>
+          <div class="scroll-x" style="padding:0 6px 8px"><table><thead><tr><th>Intervention</th><th>Direct cost</th><th>Implied P(fail)</th><th>Est. prob. reduction</th><th>Failure cost</th><th>Residual cost</th><th>Total expected</th></tr></thead><tbody>${ev.map(a => `<tr class="${a === best ? 'chosen' : ''}"><td>${a.k}</td><td>${fmt(a.cost)}</td><td>${(a.p * 100).toFixed(1)}%</td><td>${a.red ? Math.round(a.red * 100) + '%' : '—'}</td><td>${fmt(C)}</td><td>${fmt(a.residual)}</td><td>${fmt(a.total)}</td></tr>`).join('')}</tbody></table></div>
+        </div>
+      </div>`;
+  };
+
+  const select = id => { sel = id; drawMap(); drawFeed(); drawDetail(); };
+  document.querySelectorAll('#thr button').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('#thr button').forEach(x => x.classList.remove('on')); b.classList.add('on');
+    thr = +b.dataset.t;
+    const cur = orders.find(o => o.id === sel), top = orders.filter(o => o.score >= thr).sort((a, c) => c.score - a.score)[0];
+    if (top && cur.score < thr) sel = top.id;
+    drawMap(); drawFeed(); drawDetail();
+  }));
+  sel = [...orders].sort((a, b) => b.score - a.score)[0].id;
+  drawMap(); drawFeed(); drawDetail();
+
+  let secs = 0;
+  if (!reduce) setInterval(() => {
+    orders.forEach(o => { o.t += .015; if (o.t >= 1) o.t = 0; });
+    drawMap(); secs += 2; $('#upd').textContent = `replica console · updated ${secs < 60 ? secs + 's' : Math.floor(secs / 60) + 'm'} ago`;
+  }, 2000);
+
+  /* EV calculator */
+  const evDraw = () => {
+    const s = +$('#evRisk').value, C = +$('#evFail').value;
+    $('#evRiskV').textContent = s; $('#evFailV').textContent = fmt(C);
+    const ev = evaluate(s, C), best = ev.reduce((a, b) => b.total < a.total ? b : a), base = ev[0];
+    $('#evChosen').innerHTML = `Chosen: <b>${best.k}</b>`;
+    $('#evStats').innerHTML = `<div><span>Direct cost</span><b>${fmt(best.cost)}</b></div><div><span>Est. residual failure cost</span><b>${fmt(best.residual)}</b></div><div><span>Baseline (do nothing) cost</span><b>${fmt(base.total)}</b></div><div><span>Expected net value vs. doing nothing</span><b class="pos">+${fmt(base.total - best.total)}</b></div>`;
+    $('#evTable').innerHTML = ev.map(a => `<tr class="${a === best ? 'chosen' : ''}"><td>${a.k}</td><td>${fmt(a.cost)}</td><td>${(a.p * 100).toFixed(1)}%</td><td>${a.red ? Math.round(a.red * 100) + '%' : '—'}</td><td>${fmt(a.residual)}</td><td>${fmt(a.total)}</td></tr>`).join('');
+  };
+  ['#evRisk', '#evFail'].forEach(s => $(s).addEventListener('input', evDraw));
+  document.querySelectorAll('.presets button').forEach(b => b.addEventListener('click', () => { $('#evRisk').value = b.dataset.r; $('#evFail').value = b.dataset.f; evDraw(); }));
+  evDraw();
+
+  /* architecture */
+  const setL = k => { document.querySelectorAll('#layers button').forEach(b => b.classList.toggle('on', b.dataset.k === k)); document.querySelectorAll('#arch .box').forEach(b => b.classList.toggle('on', b.dataset.k === k)); };
+  document.querySelectorAll('#layers button, #arch .box').forEach(e => e.addEventListener('click', () => setL(e.dataset.k)));
+})();
+</script>
+</body>
+</html>

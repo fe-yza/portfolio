@@ -80,36 +80,17 @@ export const projects = [
     image: "/hero/scotiabankicon.png",
   },
   {
-    id: "3",
-    tag: "[CASE_STUDY_PLACEHOLDER_3]",
-    title: "Project Name — Mobile App",
-    type: "Mobile App",
-    summary: "Built a design system from scratch that unified three product surfaces.",
-    variant: "duo",
-    problem:
-      "Placeholder: describe the core user or business problem this project set out to solve.",
-    process:
-      "Placeholder: outline the research, ideation, and iteration process — interviews, flows, wireframes, testing.",
-    myRole:
-      "Placeholder: describe your specific responsibilities and contributions on the team.",
-    outcome:
-      "Placeholder: describe the shipped outcome and the measurable impact it had.",
-  },
-  {
-    id: "4",
-    tag: "[CASE_STUDY_PLACEHOLDER_4]",
-    title: "Project Name — Website",
-    type: "Website",
-    summary: "Rebuilt a marketing site with a component library that shipped features 3x faster.",
-    variant: "mint",
-    problem:
-      "Placeholder: describe the core user or business problem this project set out to solve.",
-    process:
-      "Placeholder: outline the research, ideation, and iteration process — interviews, flows, wireframes, testing.",
-    myRole:
-      "Placeholder: describe your specific responsibilities and contributions on the team.",
-    outcome:
-      "Placeholder: describe the shipped outcome and the measurable impact it had.",
+    id: "orderguard",
+    route: "/work/orderguard",
+    title: "OrderGuard",
+    type: "Web App",
+    category: "Personal Project",
+    summary:
+      "Predicts delivery failure risk and evaluates cost-justified interventions in a synthetic on-demand delivery marketplace.",
+    variant: "sky",
+    image: "/hero/orderguard-cover.png",
+    imageFit: "contain",
+    wide: true,
   },
 ]
 
